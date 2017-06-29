@@ -1,0 +1,11 @@
+#
+# Please keep services sorted in alphabetical order ¯\_(ツ)_/¯
+#
+services:
+    api.service:
+        class: MainBundle\Service\ApiService
+        arguments:
+            - "@doctrine.orm.entity_manager"
+        calls:
+            - [setParameterBag, ["@=service('kernel').getContainer().getParameterBag()"]]
+    

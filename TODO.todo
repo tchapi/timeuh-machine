@@ -1,0 +1,59 @@
+Telegram bot :
+
+Adresse (http://t.me/RadioMeuhBot)
+token : 387881175:AAGzso_jZigaosqILM3PUXT7c9TkrBp-mVk
+
+  /stream
+
+  /playlist
+
+  /nowplaying
+
+  /next
+
+  /spotify :
+    créer une playlist par jour
+    toutes les playlists par jour, par mois, recherchables
+
+Website :
+
+
+ ☐ Parser les titres et infos pour extraire les titres manquants
+
+ ☐ Faire la home
+ ☐ Faire la page about
+ ☐ Faire la page timeuhmachine
+ ☐ Reconnaitre les jingles et emissions
+ ☐ Ajouter les liens tuneefy
+
+Home en mode isotope avec latest songs played
+ * https://masonry.desandro.com/layout.html
+ * load more au scroll
+
+  structure :
+   - home
+   - playlists par jour
+    * liste : chaque jour de la liste prend l'image d'une des tracks ou un patchwork des tracks ?
+    * vue par mois ou par semaine ?
+   - lien vers player web
+   - lien vers site web
+   - a propos
+
+   - recherche (genre ?) -> v2
+
+
+Reconnaitre les jingles et emissions
+  21:00:16
+Laurent Garnier
+It Is What It Is S07 -Ep10 (Blues)
+
+  21:00:15
+Jingle
+__
+
+
+Radiomeuhbox :
+
+Stream :
+http://radiomeuh.ice.infomaniak.ch:8000/radiomeuh-128.mp3
+ + faire une boite sympa avec le logo ?
