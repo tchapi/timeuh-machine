@@ -3,7 +3,6 @@
 namespace MainBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity
@@ -27,7 +26,7 @@ class Track
      * @ORM\Column(type="string", nullable=true)
      */
     private $album;
-    
+
     /**
      * @ORM\Column(type="string", nullable=true)
      */

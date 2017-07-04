@@ -5,7 +5,6 @@ namespace MainBundle\Command;
 use MainBundle\Service\ApiService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TrackFetcherCommand extends ContainerAwareCommand
@@ -30,8 +29,8 @@ class TrackFetcherCommand extends ContainerAwareCommand
 
         if ($code === ApiService::RETURN_FAILURE || $code === ApiService::RETURN_BAD_RESPONSE) {
             $output->writeln('<error>There was a problem fetching data</error>');
-        } else if ($code === ApiService::RETURN_SUCCESS) {
-            $output->writeln('<info>Data retrieved</info>');   
+        } elseif ($code === ApiService::RETURN_SUCCESS) {
+            $output->writeln('<info>Data retrieved</info>');
         }
 
         $output->writeln('<info>Done, quitting.</info>');

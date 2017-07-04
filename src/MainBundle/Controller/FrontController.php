@@ -2,10 +2,10 @@
 
 namespace MainBundle\Controller;
 
+use MainBundle\Entity\Track;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use MainBundle\Entity\Track;
 
 /**
  * Main frontend controller for the website.
