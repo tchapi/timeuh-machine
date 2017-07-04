@@ -49,6 +49,46 @@ class Track
     private $tuneefyLink;
 
     /**
+     * Runs different tests to see if this Track is really a song.
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        $title = strtolower($this->title);
+
+        // Is a RadioMeuh Jingle ?
+        if ($title === 'jingle') {
+            return false;
+        }
+
+        // Is a podcast ?
+        if (strpos($title, 'podcast') !== false) {
+            return false;
+        }
+
+        // Is an episode of a serie / podcast ?
+        if (preg_match("/.*S[0-9]+\s?[\-\—]\s?Ep[0-9]+.*/", $title)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Cleans up the track / artist / album separation of this Track.
+     */
+    public function clean(): void
+    {
+        if ($this->title === null &&
+            preg_match("(?P<artist>[^\-\—]*)\s+[\-\–]\s+(?P<title>[^\-\—]*)", $this->artist, $matches)
+            ) {
+            $this->artist = $matches['artist'];
+            $this->title = $matches['title'];
+        }
+    }
+
+    /**
      * Get id.
      *
      * @return int
@@ -59,7 +99,7 @@ class Track
     }
 
     /**
-     * Set title
+     * Set title.
      *
      * @param string $title
      *
@@ -73,7 +113,7 @@ class Track
     }
 
     /**
-     * Get title
+     * Get title.
      *
      * @return string
      */
@@ -83,7 +123,7 @@ class Track
     }
 
     /**
-     * Set album
+     * Set album.
      *
      * @param string $album
      *
@@ -97,7 +137,7 @@ class Track
     }
 
     /**
-     * Get album
+     * Get album.
      *
      * @return string
      */
@@ -107,7 +147,7 @@ class Track
     }
 
     /**
-     * Set artist
+     * Set artist.
      *
      * @param string $artist
      *
@@ -121,7 +161,7 @@ class Track
     }
 
     /**
-     * Get artist
+     * Get artist.
      *
      * @return string
      */
@@ -131,7 +171,7 @@ class Track
     }
 
     /**
-     * Set startedAt
+     * Set startedAt.
      *
      * @param \DateTime $startedAt
      *
@@ -145,7 +185,7 @@ class Track
     }
 
     /**
-     * Get startedAt
+     * Get startedAt.
      *
      * @return \DateTime
      */
@@ -155,7 +195,7 @@ class Track
     }
 
     /**
-     * Set image
+     * Set image.
      *
      * @param string $image
      *
@@ -169,7 +209,7 @@ class Track
     }
 
     /**
-     * Get image
+     * Get image.
      *
      * @return string
      */
@@ -179,7 +219,7 @@ class Track
     }
 
     /**
-     * Set tuneefyLink
+     * Set tuneefyLink.
      *
      * @param string $tuneefyLink
      *
@@ -193,7 +233,7 @@ class Track
     }
 
     /**
-     * Get tuneefyLink
+     * Get tuneefyLink.
      *
      * @return string
      */

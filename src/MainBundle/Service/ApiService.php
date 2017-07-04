@@ -2,18 +2,16 @@
 
 namespace MainBundle\Service;
 
-use Doctrine\ORM\EntityManager;
 use MainBundle\Entity\Track;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 /**
- * The service that calls the pseudo RadioMeuh API
+ * The service that calls the pseudo RadioMeuh API.
  *
  * @author Cyril Chapellier
  */
 final class ApiService
 {
-
     const RETURN_SUCCESS = 1;
     const RETURN_FAILURE = 0;
     const RETURN_BAD_RESPONSE = -1;
@@ -25,7 +23,7 @@ final class ApiService
 
     public function __construct($entityManager)
     {
-      $this->em = $entityManager;
+        $this->em = $entityManager;
     }
 
     /**
@@ -51,25 +49,8 @@ final class ApiService
     }
 
     /**
-     * Validates if a track is an actual song
-     *
-     * @param Track $track
-     *
-     * @return bool
-     */
-    private function validateSong(Track $track): bool
-    {
-        if ($track->getTitle() === "Jingle") {
-            return false;
-        }
-
-        // @TODO check for series / episodes / podcasts
-        return true;
-    }
-
-    /**
      * Retrieves the two current and last tracks from the API
-     * and stores them
+     * and stores them.
      *
      * @return int
      */
@@ -83,7 +64,7 @@ final class ApiService
             CURLOPT_FOLLOWLOCATION => 1,
             CURLOPT_TIMEOUT_MS => 2000,
             CURLOPT_CONNECTTIMEOUT_MS => 2000,
-            CURLOPT_URL => $this->getParameter("track_endpoint"),
+            CURLOPT_URL => $this->getParameter('track_endpoint'),
         ]);
 
         $response = curl_exec($ch);
@@ -103,7 +84,6 @@ final class ApiService
         $tracksRepository = $this->em->getRepository(Track::class);
 
         foreach ($tracks->track as $track) {
-
             // The starting time of the song is a unique identifier so we can rely
             // on that to see if we've hit the same playlist or not in this call :
             $startingTime = new \Datetime($track->time);
@@ -120,9 +100,11 @@ final class ApiService
             $t->setImage(trim($track->imgSrc));
             $t->setStartedAt($startingTime);
 
-            if (!$this->validateSong($t)) {
+            if (!$t->isValid()) {
                 continue;
             }
+
+            $t->clean();
 
             $this->em->persist($t);
         }
