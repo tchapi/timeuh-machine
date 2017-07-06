@@ -16,6 +16,8 @@ parameters:
     secret:            ThisTokenIsNotSoSecretChangeIt
 
     ga_tracker_id:     0
+
+    tracks_per_page:   9
     
     track_endpoint: http://player.radiomeuh.com/rtdata/tracks.xml
 

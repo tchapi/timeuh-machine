@@ -3,8 +3,22 @@
 {% block content %}
 HOME
 
+<h2>{{ "currently.playing"|trans }}</h2>
+
+{% if current %}
+  {{ current.startedAt|date() }}
+  <img src="{{ current.image }}" />
+  {{ current.title }}
+  {{ current.album }}
+  {{ current.artist }}
+{% else %}
+  <em>{{ "no.currently.playing"|trans }}</em>
+{% endif %}
+
+<h2>{{ "last.tracks"|trans }}</h2>
+
 <ul>
-{% for track in tracks %}
+{% for track in lastTracks %}
   <li>
     {{ track.startedAt|date() }}
     <img src="{{ track.image }}" />

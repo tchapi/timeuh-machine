@@ -5,7 +5,7 @@ namespace MainBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="MainBundle\Repository\TrackRepository")
  * @ORM\Table(name="track")
  */
 class Track

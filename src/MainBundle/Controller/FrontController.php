@@ -19,10 +19,14 @@ class FrontController extends Controller
      */
     public function homeAction(Request $request)
     {
-        $tracks = $this->get('doctrine')->getRepository(Track::class)->findAll();
+        $trackRepository = $this->get('doctrine')->getRepository(Track::class);
+
+        $current = $trackRepository->findCurrentlyPlayingTrack();
+        $lastTracks = $trackRepository->findNLastTracksExceptCurrent($this->getParameter('tracks_per_page'), $current);
 
         return $this->render('home.html.twig', [
-            'tracks' => $tracks,
+            'current' => $current,
+            'lastTracks' => $lastTracks,
         ]);
     }
 
@@ -35,13 +39,16 @@ class FrontController extends Controller
     }
 
     /**
-     * @Route("/timeuh-machine", name="timeuhMachine")
+     * @Route("/archives/{year}/{month}/{day}", name="archives", requirements={"year" = "\d+", "month" = "\d+", "day" = "\d+"})
      */
-    public function timeuhMachineAction(Request $request)
+    public function archivesAction(Request $request, ?int $year = null, ?int $month = null, ?int $day = null)
     {
+        // Get tracks for current month
         $tracks = $this->get('doctrine')->getRepository(Track::class)->findAll();
 
-        return $this->render('timeuhMachine.html.twig', [
+        // Infinite scroll to get the other months
+
+        return $this->render('archives.html.twig', [
             'tracks' => $tracks,
         ]);
     }
