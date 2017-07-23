@@ -14,7 +14,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('archivemeuh:fetch-tracks')
+            ->setName('timeuh-machine:fetch-tracks')
             ->setDescription('Fetch tracks from pseudo API and store result');
     }
 

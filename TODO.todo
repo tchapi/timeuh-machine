@@ -18,13 +18,17 @@ token : 387881175:AAGzso_jZigaosqILM3PUXT7c9TkrBp-mVk
 Website :
 
 
- ☐ Parser les titres et infos pour extraire les titres manquants
+ ✔ Parser les titres et infos pour extraire les titres manquants @done (17-07-23 18:26)
+ ✔ Reconnaitre les jingles et emissions @done (17-07-23 18:26)
 
  ☐ Faire la home
  ☐ Faire la page about
  ☐ Faire la page timeuhmachine
- ☐ Reconnaitre les jingles et emissions
  ☐ Ajouter les liens tuneefy
+
+Bugs 
+
+ ☐ Double insert lors du passage a minuit !!
 
 Home en mode isotope avec latest songs played
  * https://masonry.desandro.com/layout.html

@@ -83,11 +83,25 @@ final class ApiService
 
         $tracksRepository = $this->em->getRepository(Track::class);
 
+        error_log("now is : " . (new \Datetime())->format('c'));
+        error_log(" ");
         foreach ($tracks->track as $track) {
+            error_log("--------------------");
             // The starting time of the song is a unique identifier so we can rely
-            // on that to see if we've hit the same playlist or not in this call :
+            // on that to see if we've hit the same playlist or not in this call.
+            // BUT we have to be cautious since only the HH:mm:ss is indicated in
+            // the API result.
             $startingTime = new \Datetime($track->time);
+            error_log("track starting time : " . $track->time . " --> " . $startingTime->format('H'));
+            if (intval($startingTime->format('H')) > 23 && intval((new \Datetime())->format('H')) < 1 ) {
+                error_log("Track was YESTERDAY");
+                // We have hit a track that was played yesterday, and not today
+                $startingTime->sub(new \DateInterval('P1D'));
+            } else {
+                error_log("Track is TODAY");
+            }
 
+            error_log("Final starting time is : " . $startingTime->format('c'));
             if ($tracksRepository->findOneByStartedAt($startingTime)) {
                 continue;
             }
@@ -100,15 +114,17 @@ final class ApiService
             $t->setImage(trim($track->imgSrc));
             $t->setStartedAt($startingTime);
 
-            if (!$t->isValid()) {
-                continue;
-            }
+            // Puts a valid flag on it, depending if it's a song
+            // or something else like a podcast ...
+            $t->checkValid();
 
             $t->clean();
 
             $this->em->persist($t);
+            error_log("(persisted)");
         }
 
+        error_log(" ");
         // Fetch from tuneefy.com if needed
         // @TODO
 
