@@ -93,7 +93,7 @@ final class ApiService
             // the API result.
             $startingTime = new \Datetime($track->time);
             error_log("track starting time : " . $track->time . " --> " . $startingTime->format('H'));
-            if (intval($startingTime->format('H')) > 23 && intval((new \Datetime())->format('H')) < 1 ) {
+            if (intval($startingTime->format('H')) == 23 && intval((new \Datetime())->format('H')) == 0 ) {
                 error_log("Track was YESTERDAY");
                 // We have hit a track that was played yesterday, and not today
                 $startingTime->sub(new \DateInterval('P1D'));
