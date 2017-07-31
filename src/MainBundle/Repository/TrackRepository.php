@@ -14,7 +14,7 @@ class TrackRepository extends EntityRepository
         return $this->createQueryBuilder('t')
                ->where('t.startedAt > :limit')
                ->setParameter('limit', $limit)
-               ->andWhere('t.valid == 1')
+               ->andWhere('t.valid = 1')
                ->getQuery()
                ->setMaxResults(1)
                ->getOneOrNullResult();
@@ -23,7 +23,7 @@ class TrackRepository extends EntityRepository
     public function findNLastTracksExceptCurrent(int $max, ?Track $current)
     {
         $q = $this->createQueryBuilder('t')
-                  ->where('t.valid == 1');
+                  ->where('t.valid = 1');
 
         if ($current) {
           $q->andWhere('t.id != :currentId')

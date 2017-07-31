@@ -28,7 +28,7 @@ Website :
 
 Bugs 
 
- ☐ Double insert lors du passage a minuit !!
+ ✔ Double insert lors du passage a minuit !! @done (17-07-25 00:17)
 
 Home en mode isotope avec latest songs played
  * https://masonry.desandro.com/layout.html
