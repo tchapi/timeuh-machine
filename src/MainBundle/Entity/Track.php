@@ -53,64 +53,6 @@ class Track
     private $valid;
 
     /**
-     * Runs different tests to see if this Track is really a song.
-     */
-    public function checkValid(): void
-    {
-        $title = strtolower($this->title);
-        $album = strtolower($this->album);
-        $artist = strtolower($this->artist);
-
-        // Is a RadioMeuh Jingle ?
-        // ex : PetiteRadiomeuh (Jingle), Jingle, ...
-        if (strpos($title, 'jingle') !== false ||
-            strpos($artist, 'jingle') !== false ||
-            strpos($title, 'radiomeuh') !== false) {
-            $this->valid = false;
-            return;
-        }
-
-        // Have we got at least 2 info out of 3 ?
-        if (($title === "" && $artist === "") ||
-            ($title === "" && $album === "") ||
-            ($album === "" && $artist === "")) {
-            $this->valid = false;
-            return;
-        }
-
-        // Is a podcast ?
-        if (strpos($title, 'podcast') !== false) {
-            $this->valid = false;
-            return;
-        }
-
-        // Is a podcast, you sure ?
-        // ex : Moon Tapes, La Dominicale n15, Free Your Mind n18 ...
-        if (strpos($album, '.com/') !== false) {
-            $this->valid = false;
-            return;
-        }
-
-        // Is a series / an episode of a serie ?
-        //ex: Les Sessions du Bastidon #2, ...
-        // TODO TODO
-        if (preg_match("/.*session.*\#[0-9]+.*/", $title) ||
-            preg_match("/.*dominicale\s+n[0-9]+.*/", $title) ||
-            preg_match("/.*free\syour\smind\s+n[0-9]+.*/", $title)) {
-            $this->valid = false;
-            return;
-        }
-
-        // Is an episode of a podcast ?
-        if (preg_match("/.*S[0-9]+\s?[\-\—]\s?Ep[0-9]+.*/", $title)) {
-            $this->valid = false;
-            return;
-        }
-
-        $this->valid = true;
-    }
-
-    /**
      * Cleans up the track / artist / album separation of this Track.
      */
     public function clean(): void

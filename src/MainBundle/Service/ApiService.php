@@ -41,11 +41,83 @@ final class ApiService
      *
      * @param string $name
      *
-     * @return string
+     * @return mixed
      */
-    private function getParameter(string $name): string
+    private function getParameter(string $name)
     {
         return $this->parameterBag->get($name);
+    }
+
+    /**
+     * Runs different tests to see if this Track is really a song.
+     *
+     * @param Track $track
+     */
+    private function checkValid(Track $track): void
+    {
+        $title = strtolower($track->getTitle());
+        $album = strtolower($track->getAlbum());
+        $artist = strtolower($track->getArtist());
+
+        // Is it a RadioMeuh Jingle ?
+        // ex : PetiteRadiomeuh (Jingle), Jingle, ...
+        if (strpos($title, 'jingle') !== false ||
+            strpos($artist, 'jingle') !== false ||
+            strpos($title, 'radiomeuh') !== false) {
+            $track->setValid(false);
+            return;
+        }
+
+        // Have we got at least 2 pieces of info out of 3 ?
+        if (($title === "" && $artist === "") ||
+            ($title === "" && $album === "") ||
+            ($album === "" && $artist === "")) {
+            $track->setValid(false);
+            return;
+        }
+
+        // Is a podcast ?
+        if (strpos($title, 'podcast') !== false) {
+            $track->setValid(false);
+            return;
+        }
+
+        // Is a podcast, you sure ? It might have an url instead of an album
+        if (strpos($album, '.com/') !== false) {
+            $track->setValid(false);
+            return;
+        }
+
+        // General exclude rules
+        // ex : Moon Tapes, La Dominicale n15, Free Your Mind n18 ...
+        foreach ($this->getParameter('excludes')['title'] as $regex) {
+            if (preg_match($regex, $title)) {
+                $track->setValid(false);
+                return;
+            }
+        }
+
+        foreach ($this->getParameter('excludes')['album'] as $regex) {
+            if (preg_match($regex, $album)) {
+                $track->setValid(false);
+                return;
+            }
+        }
+
+        foreach ($this->getParameter('excludes')['artist'] as $regex) {
+            if (preg_match($regex, $artist)) {
+                $track->setValid(false);
+                return;
+            }
+        }
+
+        // Is an episode of a podcast nevertheless ?
+        if (preg_match("/.*S[0-9]+\s?[\-\—]\s?Ep[0-9]+.*/", $title)) {
+            $track->setValid(false);
+            return;
+        }
+
+        $track->setValid(true);
     }
 
     /**
@@ -110,7 +182,7 @@ final class ApiService
 
             // Puts a valid flag on it, depending if it's a song
             // or something else like a podcast ...
-            $t->checkValid();
+            $this->checkValid($t);
 
             $t->clean();
 
