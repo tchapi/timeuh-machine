@@ -94,8 +94,9 @@ class Track
         // Is a series / an episode of a serie ?
         //ex: Les Sessions du Bastidon #2, ...
         // TODO TODO
-        if (preg_match("/.*Session.*\#[0-9]+.*/", $title) ||
-            preg_match("/.*Dominicale\s+n[0-9]+.*/", $title)) {
+        if (preg_match("/.*session.*\#[0-9]+.*/", $title) ||
+            preg_match("/.*dominicale\s+n[0-9]+.*/", $title) ||
+            preg_match("/.*free\syour\smind\s+n[0-9]+.*/", $title)) {
             $this->valid = false;
             return;
         }
