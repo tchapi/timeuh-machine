@@ -12,6 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   {% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/semantic.min.css') }}" type="text/css" />
     <link rel="stylesheet" href="{{ asset('css/main.css') }}" type="text/css" />
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -20,19 +21,27 @@
 </head>
 <body>
 
-<nav>
-<ul>
-  <li><a href="{{ path('home') }}">Home</a></li>
-  <li><a href="{{ path('archives') }}">Archives</a></li>
-  <li><a href="{{ path('about') }}">About</a></li>
-</ul>
+<div class="ui container">
+<nav class="ui text menu">
+  <div class="header item">Timeuh Machine</div>
+  <a class="item{% if menu == "home" %} active{% endif %}" href="{{ path('home') }}">Home</a>
+  <a class="item{% if menu == "archives" %} active{% endif %}" href="{{ path('archives') }}">Archives</a>
+  <a class="item{% if menu == "about" %} active{% endif %}" href="{{ path('about') }}">About</a>
+  <div class="right item">
+      <a href="{{ player_link }}" target="_blank" class="ui basic green button">
+      <i class="music icon"></i>
+      {{ "open.player"|trans }}
+    </a>
+  </div>
 </nav>
+</div>
 
 {% block content %}
 {% endblock %}
 
 {% block javascripts %}
   <script src="{{ asset('js/jquery-3.2.0.min.js') }}"></script>
+  <script src="{{ asset('js/semantic.min.js') }}"></script>
   <script src="{{ asset('js/main.js') }}"></script>
 
   {% if ga_tracker_id != "0" %}

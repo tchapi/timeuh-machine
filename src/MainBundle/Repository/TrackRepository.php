@@ -15,6 +15,7 @@ class TrackRepository extends EntityRepository
                ->where('t.startedAt > :limit')
                ->setParameter('limit', $limit)
                ->andWhere('t.valid = 1')
+               ->orderBy('t.startedAt', 'DESC')
                ->getQuery()
                ->setMaxResults(1)
                ->getOneOrNullResult();
