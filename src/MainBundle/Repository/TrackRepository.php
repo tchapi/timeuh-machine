@@ -32,8 +32,48 @@ class TrackRepository extends EntityRepository
         }
 
         return $q->setMaxResults($max)
+                 ->setFirstResult(($page-1)*$max)
                  ->orderBy('t.startedAt', 'DESC')
                  ->getQuery()
                  ->getResult();
+    }
+
+    public function findByYear($year)
+    {
+        return $this->createQueryBuilder('t')
+             ->where('YEAR(t.startedAt) = :year')
+             ->setParameter('year', $year)
+             ->andWhere('t.valid = 1')
+             ->orderBy('t.startedAt', 'DESC')
+             ->getQuery()
+             ->getResult();
+    }
+
+    public function findByMonth($year, $month)
+    {
+        return $this->createQueryBuilder('t')
+             ->where('YEAR(t.startedAt) = :year')
+             ->setParameter('year', $year)
+             ->andWhere('MONTH(t.startedAt) = :month')
+             ->setParameter('month', $month)
+             ->andWhere('t.valid = 1')
+             ->orderBy('t.startedAt', 'DESC')
+             ->getQuery()
+             ->getResult();
+    }
+
+    public function findByDay($year, $month, $day)
+    {
+        return $this->createQueryBuilder('t')
+             ->where('YEAR(t.startedAt) = :year')
+             ->setParameter('year', $year)
+             ->andWhere('MONTH(t.startedAt) = :month')
+             ->setParameter('month', $month)
+             ->andWhere('DAY(t.startedAt) = :day')
+             ->setParameter('day', $day)
+             ->andWhere('t.valid = 1')
+             ->orderBy('t.startedAt', 'DESC')
+             ->getQuery()
+             ->getResult();
     }
 }

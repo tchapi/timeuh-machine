@@ -1,0 +1,47 @@
+{% extends "base.html.twig" %}
+{% set menu = 'archives' %}
+
+{% block content %}
+
+<div class="ui container">
+  <h1>{{ "archives.title"|trans }} > <a href="{{ path('archives', {year: year}) }}">{{ year }}</a> > <a href="{{ path('archives', {year: year, month: month}) }}">{{ monthName|capitalize }}</a> > {{ day }}</h1>
+
+  <h2>{{ "archives.titles.on.this.day"|trans({'%day%': day~" "~(monthName|capitalize)~" "~year}) }}</h2>
+  <div class="ui divided items">
+  {% set hour = null %}
+    {% for track in tracks %}
+    {% if hour == null or hour != track.startedAt|date('H') %}
+    <div class="item"><h3><i class="ui icon time"></i> {{ track.startedAt|date('H:00') }} → {{ track.startedAt|date_modify("+1 hour")|date('H:00') }}</h3></div>
+    {% endif %}
+    {% set hour = track.startedAt|date('H') %}
+    <div class="item">
+      <a class="ui tiny image">
+        <img src="{{ track.image?:asset('img/album_placeholder.png') }}">
+      </a>
+      <div class="middle aligned content">
+        {% if track.tuneefyLink %}
+            <a href="{{ track.tuneefyLink }}" class="ui right floated primary button" target="_blank">
+              <i class="sound ui icon"></i> {{ "see.on.tuneefy"|trans }}
+            </a>
+            {% else %}
+            <button class="ui primary right floated  button disabled">
+              <i class="meh icon"></i> {{ "no.tuneefy.result"|trans }}
+            </button>
+            {% endif %}
+        <a class="header">{{ track.title }}</a>
+        <div class="meta">
+          <span class="artist"><i class="user blue circle icon"></i> {{ track.artist?:("unknown.artist"|trans) }}</span>
+          <span class="album"><i class="music blue icon"></i> {{ track.album?:("unknown.album"|trans) }}</span>
+        </div>
+        <div class="extra">
+          <i class="time icon"></i> {{ "onair.title"|trans }} {% if track.startedAt|date("d") == "now"|date('d') %}{{ "today"|trans }}{% else %}{{ "onair.onthe"|trans }} {{ track.startedAt|date("d/m") }}{% endif %} {{ "onair.at"|trans }} {{ track.startedAt|date("H:i") }}
+        </div>
+      </div>
+      
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}

@@ -184,17 +184,84 @@ final class ApiService
             // or something else like a podcast ...
             $this->checkValid($t);
 
+            if ($t->isValid()) {
+                // Fetch from tuneefy API
+                $result = $this->getTuneefyLinkAndImage($t);
+                if ($result) {
+                    $t->setTuneefyLink($result['link']);
+                    if ($result['image']) {
+                        $t->setImage($result['image']);
+                    }
+                }
+            }
+
             $t->clean();
 
             $this->em->persist($t);
         }
 
-        // Fetch from tuneefy.com if needed
-        // @TODO
-
         // Flush the whole thing
         $this->em->flush();
 
         return self::RETURN_SUCCESS;
+    }
+
+    /**
+    */
+    public function getTuneefyLinkAndImage(Track $track)
+    {
+        $searchTerm = $track->getTitle() . " " . $track->getArtist();
+
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_HTTPHEADER => [
+                "Accept: application/json",
+                "Authorization: bearer " . $this->getParameter('tuneefy_token')
+            ],
+            CURLOPT_URL => str_replace("%s", urlencode($searchTerm), $this->getParameter('tuneefy_track_endpoint')),
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$response) {
+            return null;
+        }
+
+        $data = json_decode($response, false);
+        if (!isset($data->results)) {
+            return null;
+        }
+
+        $intent = $data->results[0]->share->intent;
+        $image = $data->results[0]->musical_entity->album->picture;
+
+        // Get the link
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_HTTPHEADER => [
+                "Accept: application/json",
+                "Authorization: bearer " . $this->getParameter('tuneefy_token')
+            ],
+            CURLOPT_URL => str_replace("%s", $intent, $this->getParameter('tuneefy_share_endpoint')),
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$response) {
+            return null;
+        }
+
+        $data = json_decode($response);
+
+        return [
+            "link" => $data->link,
+            "image" => $image,
+        ];
     }
 }
