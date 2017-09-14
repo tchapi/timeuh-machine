@@ -9,7 +9,7 @@ class TrackRepository extends EntityRepository
 {
     public function findCurrentlyPlayingTrack()
     {
-        $limit = new \Datetime('now - 10 minutes');
+        $limit = new \Datetime('now - 30 minutes');
 
         return $this->createQueryBuilder('t')
                ->where('t.startedAt > :limit')

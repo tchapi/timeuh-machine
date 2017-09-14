@@ -1,0 +1,32 @@
+{% for track in lastTracks %}
+  <div class="card">
+    <div class="blurring dimmable image">
+      <div class="ui dimmer">
+        <div class="content">
+          <div class="center">
+            {% if track.tuneefyLink %}
+            <a href="{{ track.tuneefyLink }}" class="ui inverted button">{{ "see.on.tuneefy"|trans }}</a>
+            {% else %}
+            <button class="ui inverted button disabled">{{ "no.tuneefy.result"|trans }}</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <img src="{{ track.image?:asset('img/album_placeholder.png') }}">
+    </div>
+    <div class="content">
+      {% if track.tuneefyLink %}
+      <a href="{{ track.tuneefyLink }}" class="header">{{ track.title?:("unknown.title"|trans) }}</a>
+      {% else %}
+      <div class="header">{{ track.title?:("unknown.title"|trans) }}</div>
+      {% endif %}
+      <div class="meta">
+        <div class="artist"><i class="user blue circle icon"></i> {{ track.artist?:("unknown.artist"|trans) }}</div>
+        <div class="album"><i class="music blue icon"></i> {{ track.album?:("unknown.album"|trans) }}</div>
+      </div>
+    </div>
+    <div class="extra content">
+        <i class="time icon"></i> {{ "onair.title"|trans }} {% if track.startedAt|date("d") == "now"|date('d') %}{{ "today"|trans }}{% else %}{{ "onair.onthe"|trans }} {{ track.startedAt|date("d/m") }}{% endif %} {{ "onair.at"|trans }} {{ track.startedAt|date("H:i") }}
+    </div>
+  </div>
+{% endfor %}

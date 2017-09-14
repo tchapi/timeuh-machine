@@ -8,4 +8,4 @@ parameters:
           - "/.*Dominicale\\s+n[0-9]+.*/"
           - "/.*Free\\syour\\sMind\\s+n?[0-9]+.*/"
           - "/.*What\\sThe\\sFunk\\sRadio\\sShow\\s[0-9]+.*/"
-          - "/.*We\\sLove\\sS[0-9]+\\sEp[0-9]+.*/"
+          - "/.*We\\sLove\\sS[0-9]+(\\s|\\.)Ep[0-9]+.*/"
