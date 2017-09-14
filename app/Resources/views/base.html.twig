@@ -22,18 +22,12 @@
 <body>
 
 <div class="ui container">
-<nav class="ui text menu">
-  <div class="header item">Timeuh Machine</div>
-  <a class="item{% if menu == "home" %} active{% endif %}" href="{{ path('home') }}">Home</a>
-  <a class="item{% if menu == "archives" %} active{% endif %}" href="{{ path('archives') }}">Archives</a>
-  <a class="item{% if menu == "about" %} active{% endif %}" href="{{ path('about') }}">About</a>
-  <div class="right item">
-      <a href="{{ player_link }}" target="_blank" class="ui basic green button">
-      <i class="music icon"></i>
-      {{ "open.player"|trans }}
-    </a>
-  </div>
-</nav>
+  <nav class="ui text menu">
+    <!-- <div class="header item">Timeuh Machine</div> -->
+    <a class="item{% if menu == "home" %} active{% endif %}" href="{{ path('home') }}"><i class="ui icon home"></i> {{ "home.title"|trans }}</a>
+    <a class="item{% if menu == "archives" %} active{% endif %}" href="{{ path('archives') }}">{{ "archives.title"|trans }}</a>
+    <a class="item{% if menu == "about" %} active{% endif %}" href="{{ path('about') }}">{{ "about.title"|trans }}</a>
+  </nav>
 </div>
 
 {% block content %}

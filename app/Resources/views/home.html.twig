@@ -3,9 +3,10 @@
 
 {% block content %}
 
-<div class="ui container">
+<div class="ui container current">
   <h2>{{ "currently.playing"|trans }}</h2>
 
+  <div class="ui segment basic one column centered grid">
   {% if current %}
     <div class="ui very relaxed items">
       <div class="item">
@@ -13,19 +14,27 @@
           <img src="{{ current.image?:asset('img/album_placeholder.png') }}">
         </div>
         <div class="content">
-          <a class="header">{{ current.title }}</a>
+          <a class="header">{{ current.title?:("unknown.title"|trans) }}</a>
           <div class="meta">
-            <i class="user circle icon"></i> {{ current.artist?:("artist.unknown"|trans) }}
+            <i class="user circle icon"></i> {{ current.artist?:("unknown.artist"|trans) }}
           </div>
           <div class="meta">
-            <i class="music grey icon"></i> {{ current.album?:("album.unknown"|trans) }}
+            <i class="music grey icon"></i> {{ current.album?:("unknown.album"|trans) }}
+          </div>
+          <div class="meta">
+            {% if current.tuneefyLink %}
+            <a href="{{ current.tuneefyLink }}" class="ui mini primary button">
+              <i class="sound ui icon"></i>
+              {{ "see.on.tuneefy"|trans }}
+            </a>
+            {% else %}
+            <button class="ui mini primary button disabled">
+              <i class="meh icon"></i> {{ "no.tuneefy.result"|trans }}
+            </button>
+            {% endif %}
           </div>
           <div class="extra">
-            <div class="ui right floated mini primary button">
-              {{ "see.on.tuneefy"|trans }}
-              <i class="right chevron icon"></i>
-            </div>
-            <i class="green time icon"></i> {{ current.startedAt|date("H:i") }}
+            <i class="green time icon"></i> {{ "onair.title"|trans }} {% if current.startedAt|date("d") == "now"|date('d') %}{{ "today"|trans }}{% else %}{{ "onair.onthe"|trans }} {{ current.startedAt|date("d/m") }}{% endif %} {{ "onair.at"|trans }} {{ current.startedAt|date("H:i") }}
           </div>
         </div>
       </div>
@@ -33,41 +42,18 @@
   {% else %}
     <em>{{ "no.currently.playing"|trans }}</em>
   {% endif %}
+  </div>
+
 </div>
 
 <div class="ui container">
   <h2>{{ "last.tracks"|trans }}</h2>
 
   <div class="ui four doubling music cards">
-    {% for track in lastTracks %}
-    <div class="card">
-      <div class="blurring dimmable image">
-        <div class="ui dimmer">
-          <div class="content">
-            <div class="center">
-              <div class="ui inverted button">{{ "see.on.tuneefy"|trans }}</div>
-            </div>
-          </div>
-        </div>
-        <img src="{{ track.image?:asset('img/album_placeholder.png') }}">
-      </div>
-      <div class="content">
-        <a class="header">{{ track.title }}</a>
-        <div class="meta">
-          <div class="artist"><i class="user blue circle icon"></i> {{ track.artist?:("artist.unknown"|trans) }}</div>
-          <div class="album"><i class="music blue icon"></i> {{ track.album?:("album.unknown"|trans) }}</div>
-        </div>
-      </div>
-      <div class="extra content">
-        <a>
-          <i class="time icon"></i> {{ track.startedAt|date("H:i") }}
-        </a>
-      </div>
-    </div>
-    {% endfor %}
+    {% include 'home.items.html.twig' %}
   </div>
 
-  <div class="ui active centered inline loader"></div>
+  <div id="loader" data-href="{{ path('home') }}" class="ui active centered inline loader"></div>
 
 </div>
 </div>

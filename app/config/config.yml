@@ -42,7 +42,9 @@ twig:
     strict_variables: "%kernel.debug%"
     globals:
         ga_tracker_id: "%ga_tracker_id%"
+        website_link: "%website_link%"
         player_link: "%player_link%"
+        bot_link: "%bot_link%"
 
 # Doctrine Configuration
 doctrine:

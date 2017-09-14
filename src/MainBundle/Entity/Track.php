@@ -242,4 +242,14 @@ class Track
     {
         return $this->valid;
     }
+
+    /**
+     * Is valid
+     *
+     * @return boolean
+     */
+    public function isValid()
+    {
+        return $this->valid;
+    }
 }

@@ -15,19 +15,27 @@ use Symfony\Component\HttpFoundation\Request;
 class FrontController extends Controller
 {
     /**
-     * @Route("/", name="home")
+     * @Route("/{page}", name="home", requirements={"page" = "\d+"}, defaults={"page" = 1})
      */
-    public function homeAction(Request $request)
+    public function homeAction(Request $request, int $page)
     {
+        $page = ($page > 1)?$page:1;
+
         $trackRepository = $this->get('doctrine')->getRepository(Track::class);
 
         $current = $trackRepository->findCurrentlyPlayingTrack();
-        $lastTracks = $trackRepository->findNLastTracksExceptCurrent($this->getParameter('tracks_per_page'), $current);
+        $lastTracks = $trackRepository->findNLastTracksExceptCurrentOnPage($this->getParameter('tracks_per_page'), $current, $page);
 
-        return $this->render('home.html.twig', [
-            'current' => $current,
-            'lastTracks' => $lastTracks,
-        ]);
+        if ($request->isXmlHttpRequest()) {
+            return $this->render('home.items.html.twig', [
+                'lastTracks' => $lastTracks,
+            ]);
+        } else {
+            return $this->render('home.html.twig', [
+                'current' => $current,
+                'lastTracks' => $lastTracks,
+            ]);
+        }
     }
 
     /**

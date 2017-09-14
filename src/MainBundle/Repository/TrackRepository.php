@@ -21,7 +21,7 @@ class TrackRepository extends EntityRepository
                ->getOneOrNullResult();
     }
 
-    public function findNLastTracksExceptCurrent(int $max, ?Track $current)
+    public function findNLastTracksExceptCurrentOnPage(int $max, ?Track $current, int $page)
     {
         $q = $this->createQueryBuilder('t')
                   ->where('t.valid = 1');

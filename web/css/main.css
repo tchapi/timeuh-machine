@@ -1,9 +1,28 @@
 body {
-  /*background: url(../img/header.jpg) no-repeat center -6px #FFFFFF;
+  background: url(../img/logo.png) no-repeat center 20px #FFFFFF;
   background-size: 300px;
-  padding-top: 70px;*/
+  padding-top: 170px;
+}
+
+.container.current .grid.centered {
+  font-size: 1.3em;
+  text-align: left;
+}
+
+.container.current .grid.centered .item .content {
+  margin-top: 6px;
+}
+.container.current .grid.centered .item .extra {
+  margin-top: 30px;
 }
 
 .ui.centered.inline.loader.active {
   margin: 100px auto;
+}
+
+.ellipsis {
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

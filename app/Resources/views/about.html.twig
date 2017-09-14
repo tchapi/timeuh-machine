@@ -4,6 +4,15 @@
 {% block content %}
 
 <div class="ui container">
-  <h2>{{ "about"|trans }}</h2>
+  <h2>{{ "about.title"|trans }}</h2>
+
+  <a href="{{ website_link }}" class="ui button green">{{ "about.website.open"|trans }}</a>
+  <a href="{{ player_link }}" class="ui button green">{{ "about.player.open"|trans }}</a>
+
+  <h3>{{ "about.build"|trans }}</h3>
+
+  <h3>{{ "about.bot"|trans }}</h3>
+  <a href="{{ bot_link }}" class="ui button green">{{ "about.bot.open"|trans }}</a>
+
 </div>
 {% endblock %}
