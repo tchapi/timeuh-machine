@@ -4,7 +4,7 @@
 {% block content %}
 
 <div class="ui container">
-  <h1>{{ "archives.title"|trans }} > <a href="{{ path('archives', {year: year}) }}">{{ year }}</a> > {{ monthName }}</h1>
+  <h1>{{ "archives.title"|trans }} > <a href="{{ path('archives', {year: year}) }}">{{ year }}</a> > {{ monthName|capitalize }}</h1>
 
   {% for day in days %}
     <h2>{{ day.name }} {{ monthName|capitalize }} {{ year }}</h2>

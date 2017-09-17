@@ -19,15 +19,18 @@
         <img src="{{ track.image?:asset('img/album_placeholder.png') }}">
       </a>
       <div class="middle aligned content">
-        {% if track.tuneefyLink %}
+        <div class="ui right floated buttons">
+          {% if track.tuneefyLink %}
             <a href="{{ track.tuneefyLink }}" class="ui right floated primary button" target="_blank">
               <i class="sound ui icon"></i> {{ "see.on.tuneefy"|trans }}
             </a>
-            {% else %}
+          {% else %}
             <button class="ui primary right floated  button disabled">
               <i class="meh icon"></i> {{ "no.tuneefy.result"|trans }}
             </button>
-            {% endif %}
+          {% endif %}
+          <a href="https://musicbrainz.org/search?query={{ track.artist|url_encode }}&type=artist&limit=1&method=indexed" target="_blank" class="ui button"><i class="user circle icon"></i> MusicBrainz</a>
+        </div>
         <a class="header">{{ track.title }}</a>
         <div class="meta">
           <span class="artist"><i class="user blue circle icon"></i> {{ track.artist?:("unknown.artist"|trans) }}</span>

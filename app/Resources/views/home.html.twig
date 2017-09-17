@@ -32,6 +32,7 @@
               <i class="meh icon"></i> {{ "no.tuneefy.result"|trans }}
             </button>
             {% endif %}
+            <a href="https://musicbrainz.org/search?query={{ current.artist|url_encode }}&type=artist&limit=1&method=indexed" target="_blank" class="ui mini button"><i class="user circle icon"></i> MusicBrainz</a>
           </div>
           <div class="extra">
             <i class="green time icon"></i> {{ "onair.title"|trans }} {% if current.startedAt|date("d") == "now"|date('d') %}{{ "today"|trans }}{% else %}{{ "onair.onthe"|trans }} {{ current.startedAt|date("d/m") }}{% endif %} {{ "onair.at"|trans }} {{ current.startedAt|date("H:i") }}
