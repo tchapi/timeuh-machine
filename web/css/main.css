@@ -29,7 +29,7 @@ body {
 
 .ui.cards.home > .card > .image {
   background: black;
-  height: 209px;
+  height: 208px;
   align-items: center;
   justify-content: center;
   display: flex;
