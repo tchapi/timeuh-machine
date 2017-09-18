@@ -34,3 +34,7 @@ body {
   justify-content: center;
   display: flex;
 }
+
+.ui.items > .item > .image {
+  background: black;
+}
