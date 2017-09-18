@@ -163,8 +163,9 @@ final class ApiService
             // the API result.
             $startingTime = new \Datetime($track->time);
             
-            if (intval($startingTime->format('H')) == 23 && intval((new \Datetime())->format('H')) == 0) {
+            if (intval($startingTime->format('H')) > 20 && intval((new \Datetime())->format('H')) == 0) {
                 // We have hit a track that was played yesterday, and not today
+                // Post 20:00, if we're the day after, suppose that it was yesterday
                 $startingTime->sub(new \DateInterval('P1D'));
             }
 
