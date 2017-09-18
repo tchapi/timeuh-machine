@@ -27,8 +27,7 @@ body {
   text-overflow: ellipsis;
 }
 
-.ui.card > .image,
-.ui.cards > .card > .image {
+.ui.cards.home > .card > .image {
   background: black;
   height: 209px;
   align-items: center;
