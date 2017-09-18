@@ -38,3 +38,8 @@ body {
 .ui.items > .item > .image {
   background: black;
 }
+
+.ui.very.relaxed.items.secondary.segment.piled > .item {
+  font-size: 1.25em;
+  margin: 2em;
+}
