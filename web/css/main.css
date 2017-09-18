@@ -26,3 +26,11 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.card .image {
+  background: black;
+  height: 209px;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
