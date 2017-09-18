@@ -31,8 +31,8 @@ class TrackRepository extends EntityRepository
             ->setParameter('currentId', $current->getId());
         }
 
-        return $q->setMaxResults($max)
-                 ->setFirstResult(($page-1)*$max)
+        return $q->setFirstResult(($page-1)*$max)
+                 ->setMaxResults($max)
                  ->orderBy('t.startedAt', 'DESC')
                  ->getQuery()
                  ->getResult();

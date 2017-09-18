@@ -1,5 +1,6 @@
 var currentPage = 1;
 var canFetch = true;
+var offset = 400; // px, to load content a bit in advance
 
 $(document).ready(function(){
 
@@ -11,8 +12,7 @@ $(document).ready(function(){
 
     var viewportTop = $(window).scrollTop();
     var viewportBottom = viewportTop + $(window).height();
-
-    return elementBottom > viewportTop && elementTop < viewportBottom;
+    return elementBottom > viewportTop && elementTop - offset < viewportBottom;
   };
 
   $(window).on('resize scroll', function() {
