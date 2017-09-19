@@ -34,7 +34,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
 
         if ($input->getOption('fix-missing')) {
             $output->writeln('<info>Fixing missing data in database</info>');
-            $tracks = $this->getContainer()->get('doctrine')->getRepository(Track::class)->findBy(['tuneefyLink' => NULL]);
+            $tracks = $this->getContainer()->get('doctrine')->getRepository(Track::class)->findBy(['tuneefyLink' => NULL, "valid" => 1]);
             $counter = 0;
 
             foreach ($tracks as $track) {
