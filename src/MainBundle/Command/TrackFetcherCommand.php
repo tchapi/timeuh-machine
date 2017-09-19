@@ -46,7 +46,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
                     if ($result['image']) {
                         $track->setImage($result['image']);
                     }
-                    $em->persist($t);
+                    $em->flush();
                     $output->writeln('<info>Done.</info>');
                     $counter++;
                 } else {
