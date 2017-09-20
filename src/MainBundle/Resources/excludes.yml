@@ -4,9 +4,10 @@ parameters:
       artist: []
       title:
           - "/.*Session.*\\#[0-9]+.*/"
-          - "/.*Moon\\sTapes.*/"
+          - "/.*Moon\\s+Tapes.*/"
           - "/.*Dominicale\\s+n[0-9]+.*/"
           - "/.*La\\s+Dominicale.*/"
-          - "/.*Free\\syour\\sMind\\s+n?[0-9]+.*/"
-          - "/.*What\\sThe\\sFunk\\sRadio\\sShow\\s[0-9]+.*/"
-          - "/.*We\\sLove\\sS[0-9]+(\\s|\\.)Ep[0-9]+.*/"
+          - "/.*Free\\s+your\\s+Mind\\s+n?[0-9]+.*/"
+          - "/.*What\\s+The\\s+Funk\\s+Radio\\s+Show\\s[0-9]+.*/"
+          - "/.*We\\s+Love\\s+S[0-9]+(\\s|\\.)Ep[0-9]+.*/"
+          - "/.*It\\s+Is\\s+What\\s+It\\s+Is.*/"
