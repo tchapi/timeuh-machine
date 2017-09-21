@@ -2,8 +2,8 @@
 
 namespace MainBundle\Repository;
 
-use MainBundle\Entity\Track;
 use Doctrine\ORM\EntityRepository;
+use MainBundle\Entity\Track;
 
 class TrackRepository extends EntityRepository
 {
@@ -27,11 +27,11 @@ class TrackRepository extends EntityRepository
                   ->where('t.valid = 1');
 
         if ($current) {
-          $q->andWhere('t.id != :currentId')
+            $q->andWhere('t.id != :currentId')
             ->setParameter('currentId', $current->getId());
         }
 
-        return $q->setFirstResult(($page-1)*$max)
+        return $q->setFirstResult(($page - 1) * $max)
                  ->setMaxResults($max)
                  ->orderBy('t.startedAt', 'DESC')
                  ->getQuery()
@@ -77,7 +77,7 @@ class TrackRepository extends EntityRepository
              ->getResult();
     }
 
-    public function findSpotifyIdsForMonth($year,$month)
+    public function findSpotifyIdsForMonth($year, $month)
     {
         return $this->createQueryBuilder('t')
              ->select('t.spotifyTrackId')
@@ -92,7 +92,7 @@ class TrackRepository extends EntityRepository
              ->getResult();
     }
 
-    public function findSpotifyIdsForDay($year,$month, $day)
+    public function findSpotifyIdsForDay($year, $month, $day)
     {
         return $this->createQueryBuilder('t')
              ->select('t.spotifyTrackId')
@@ -108,5 +108,4 @@ class TrackRepository extends EntityRepository
              ->getQuery()
              ->getResult();
     }
-
 }

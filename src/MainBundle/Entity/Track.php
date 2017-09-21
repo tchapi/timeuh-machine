@@ -62,7 +62,7 @@ class Track
      */
     public function clean(): void
     {
-        if ($this->title === null &&
+        if (null === $this->title &&
             preg_match("(?P<artist>[^\-\—]*)\s+[\-\–]\s+(?P<title>[^\-\—]*)", $this->artist, $matches)
             ) {
             $this->artist = $matches['artist'];
@@ -225,9 +225,9 @@ class Track
     }
 
     /**
-     * Set valid
+     * Set valid.
      *
-     * @param boolean $valid
+     * @param bool $valid
      *
      * @return Track
      */
@@ -239,9 +239,9 @@ class Track
     }
 
     /**
-     * Get valid
+     * Get valid.
      *
-     * @return boolean
+     * @return bool
      */
     public function getValid()
     {
@@ -249,9 +249,9 @@ class Track
     }
 
     /**
-     * Is valid
+     * Is valid.
      *
-     * @return boolean
+     * @return bool
      */
     public function isValid()
     {
@@ -259,7 +259,7 @@ class Track
     }
 
     /**
-     * Set spotifyTrackId
+     * Set spotifyTrackId.
      *
      * @param string $spotifyTrackId
      *
@@ -273,7 +273,7 @@ class Track
     }
 
     /**
-     * Get spotifyTrackId
+     * Get spotifyTrackId.
      *
      * @return string
      */

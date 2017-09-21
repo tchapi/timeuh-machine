@@ -61,30 +61,34 @@ final class ApiService
 
         // Is it a RadioMeuh Jingle ?
         // ex : PetiteRadiomeuh (Jingle), Jingle, ...
-        if (strpos($title, 'jingle') !== false ||
-            strpos($artist, 'jingle') !== false ||
-            strpos($title, 'radiomeuh') !== false) {
+        if (false !== strpos($title, 'jingle') ||
+            false !== strpos($artist, 'jingle') ||
+            false !== strpos($title, 'radiomeuh')) {
             $track->setValid(false);
+
             return;
         }
 
         // Have we got at least 2 pieces of info out of 3 ?
-        if (($title === "" && $artist === "") ||
-            ($title === "" && $album === "") ||
-            ($album === "" && $artist === "")) {
+        if (('' === $title && '' === $artist) ||
+            ('' === $title && '' === $album) ||
+            ('' === $album && '' === $artist)) {
             $track->setValid(false);
+
             return;
         }
 
         // Is a podcast ?
-        if (strpos($title, 'podcast') !== false) {
+        if (false !== strpos($title, 'podcast')) {
             $track->setValid(false);
+
             return;
         }
 
         // Is a podcast, you sure ? It might have an url instead of an album
-        if (strpos($album, '.com/') !== false) {
+        if (false !== strpos($album, '.com/')) {
             $track->setValid(false);
+
             return;
         }
 
@@ -93,6 +97,7 @@ final class ApiService
         foreach ($this->getParameter('excludes')['title'] as $regex) {
             if (preg_match($regex, $title)) {
                 $track->setValid(false);
+
                 return;
             }
         }
@@ -100,6 +105,7 @@ final class ApiService
         foreach ($this->getParameter('excludes')['album'] as $regex) {
             if (preg_match($regex, $album)) {
                 $track->setValid(false);
+
                 return;
             }
         }
@@ -107,6 +113,7 @@ final class ApiService
         foreach ($this->getParameter('excludes')['artist'] as $regex) {
             if (preg_match($regex, $artist)) {
                 $track->setValid(false);
+
                 return;
             }
         }
@@ -114,6 +121,7 @@ final class ApiService
         // Is an episode of a podcast nevertheless ?
         if (preg_match("/.*S[0-9]+\s?[\-\—]\s?Ep[0-9]+.*/", $title)) {
             $track->setValid(false);
+
             return;
         }
 
@@ -156,14 +164,13 @@ final class ApiService
         $tracksRepository = $this->em->getRepository(Track::class);
 
         foreach ($tracks->track as $track) {
-
             // The starting time of the song is a unique identifier so we can rely
             // on that to see if we've hit the same playlist or not in this call.
             // BUT we have to be cautious since only the HH:mm:ss is indicated in
             // the API result.
             $startingTime = new \Datetime($track->time);
-            
-            if (intval($startingTime->format('H')) > 20 && intval((new \Datetime())->format('H')) == 0) {
+
+            if (intval($startingTime->format('H')) > 20 && 0 == intval((new \Datetime())->format('H'))) {
                 // We have hit a track that was played yesterday, and not today
                 // Post 20:00, if we're the day after, suppose that it was yesterday
                 $startingTime->sub(new \DateInterval('P1D'));
@@ -207,21 +214,19 @@ final class ApiService
         return self::RETURN_SUCCESS;
     }
 
-    /**
-    */
     public function getTuneefyLinkAndImage(Track $track)
     {
-        $searchTerm = $track->getTitle() . " " . $track->getArtist();
+        $searchTerm = $track->getTitle().' '.$track->getArtist();
 
         $ch = curl_init();
 
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_HTTPHEADER => [
-                "Accept: application/json",
-                "Authorization: bearer " . $this->getParameter('tuneefy_token')
+                'Accept: application/json',
+                'Authorization: bearer '.$this->getParameter('tuneefy_token'),
             ],
-            CURLOPT_URL => str_replace("%s", urlencode($searchTerm), $this->getParameter('tuneefy_track_endpoint')),
+            CURLOPT_URL => str_replace('%s', urlencode($searchTerm), $this->getParameter('tuneefy_track_endpoint')),
         ]);
 
         $response = curl_exec($ch);
@@ -245,10 +250,10 @@ final class ApiService
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_HTTPHEADER => [
-                "Accept: application/json",
-                "Authorization: bearer " . $this->getParameter('tuneefy_token')
+                'Accept: application/json',
+                'Authorization: bearer '.$this->getParameter('tuneefy_token'),
             ],
-            CURLOPT_URL => str_replace("%s", $intent, $this->getParameter('tuneefy_share_endpoint')),
+            CURLOPT_URL => str_replace('%s', $intent, $this->getParameter('tuneefy_share_endpoint')),
         ]);
 
         $response = curl_exec($ch);
@@ -261,8 +266,8 @@ final class ApiService
         $data = json_decode($response);
 
         return [
-            "link" => $data->link,
-            "image" => $image,
+            'link' => $data->link,
+            'image' => $image,
         ];
     }
 }

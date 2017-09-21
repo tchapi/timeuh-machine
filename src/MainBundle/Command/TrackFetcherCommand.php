@@ -6,8 +6,8 @@ use MainBundle\Entity\Track;
 use MainBundle\Service\ApiService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class TrackFetcherCommand extends ContainerAwareCommand
 {
@@ -31,10 +31,9 @@ class TrackFetcherCommand extends ContainerAwareCommand
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $apiService = $this->getContainer()->get('api.service');
 
-
         if ($input->getOption('fix-missing')) {
             $output->writeln('<info>Fixing missing data in database</info>');
-            $tracks = $this->getContainer()->get('doctrine')->getRepository(Track::class)->findBy(['tuneefyLink' => NULL, "valid" => 1]);
+            $tracks = $this->getContainer()->get('doctrine')->getRepository(Track::class)->findBy(['tuneefyLink' => null, 'valid' => 1]);
             $counter = 0;
 
             foreach ($tracks as $track) {
@@ -48,21 +47,20 @@ class TrackFetcherCommand extends ContainerAwareCommand
                     }
                     $em->flush();
                     $output->writeln('<info>Done.</info>');
-                    $counter++;
+                    ++$counter;
                 } else {
                     $output->writeln('<error>No result.</error>');
                 }
             }
 
             $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
-
         } else {
             $output->writeln('<info>Fetching data from API</info>');
             $code = $apiService->getCurrentAndLastTrack();
 
-            if ($code === ApiService::RETURN_FAILURE || $code === ApiService::RETURN_BAD_RESPONSE) {
+            if (ApiService::RETURN_FAILURE === $code || ApiService::RETURN_BAD_RESPONSE === $code) {
                 $output->writeln('<error>There was a problem fetching data</error>');
-            } elseif ($code === ApiService::RETURN_SUCCESS) {
+            } elseif (ApiService::RETURN_SUCCESS === $code) {
                 $output->writeln('<info>Data retrieved</info>');
             }
         }

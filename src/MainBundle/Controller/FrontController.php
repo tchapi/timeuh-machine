@@ -21,7 +21,7 @@ class FrontController extends Controller
      */
     public function homeAction(Request $request, int $page)
     {
-        $page = ($page > 1)?$page:1;
+        $page = ($page > 1) ? $page : 1;
 
         $trackRepository = $this->get('doctrine')->getRepository(Track::class);
 
@@ -57,18 +57,17 @@ class FrontController extends Controller
         $repository = $this->get('doctrine')->getRepository(Track::class);
 
         if ($month) {
-
             if ($day) {
                 $tracks = $repository->findSpotifyIdsForDay($year, $month, $day);
-                $name = $this->get('translator')->trans('playlist.title.day', ["%date%" => $day."/".$month."/".$year]);
+                $name = $this->get('translator')->trans('playlist.title.day', ['%date%' => $day.'/'.$month.'/'.$year]);
             }
-            
+
             $tracks = $repository->findSpotifyIdsForMonth($year, $month);
-            $name = $this->get('translator')->trans('playlist.title.month', ["%month%" => strftime("%B", mktime(0, 0, 0, $month)), "%year%" => $year]);
+            $name = $this->get('translator')->trans('playlist.title.month', ['%month%' => strftime('%B', mktime(0, 0, 0, $month)), '%year%' => $year]);
         }
 
         // flatten array
-        array_walk($tracks, function(&$item, $key){
+        array_walk($tracks, function (&$item, $key) {
             $item = $item['spotifyTrackId'];
         });
 
@@ -76,11 +75,11 @@ class FrontController extends Controller
         $session = $request->getSession();
 
         $session->set('playlist', [
-                "name" =>  $name,
-                "tracks" => $tracks,
+                'name' => $name,
+                'tracks' => $tracks,
                 //"image" => "",
             ]);
-        $session->set('referer', $request->get('referer')?:$this->generateUrl('archives'));
+        $session->set('referer', $request->get('referer') ?: $this->generateUrl('archives'));
 
         // Launch the login process
         $spotifySession = new \SpotifyWebAPI\Session(
@@ -129,7 +128,7 @@ class FrontController extends Controller
 
         // Create playlist
         $createdPlaylist = $api->createUserPlaylist($me->id, [
-            'name' => $playlist['name']
+            'name' => $playlist['name'],
         ]);
 
         //$imageData = base64_encode(@file_get_contents($createdPlaylist['image']));
@@ -141,8 +140,9 @@ class FrontController extends Controller
         // Redirect to page where the user was, with a popin
         $this->addFlash(
             'success',
-            $this->get('translator')->trans('playlist.message.message', ["%name%" => $playlist['name']])
+            $this->get('translator')->trans('playlist.message.message', ['%name%' => $playlist['name']])
         );
+
         return $this->redirect($referer);
     }
 
@@ -151,14 +151,11 @@ class FrontController extends Controller
      */
     public function archivesAction(Request $request, ?int $year = null, ?int $month = null, ?int $day = null)
     {
-        setlocale(LC_TIME, \Locale::getDefault(), 'fr','fr_FR','fr_FR@euro','fr_FR.utf8','fr-FR','fra');
+        setlocale(LC_TIME, \Locale::getDefault(), 'fr', 'fr_FR', 'fr_FR@euro', 'fr_FR.utf8', 'fr-FR', 'fra');
 
         if ($year) {
-
             if ($month) {
-
                 if ($day) {
-
                     // Get tracks for current year
                     $tracks = $this->get('doctrine')->getRepository(Track::class)->findByDay($year, $month, $day);
 
@@ -166,10 +163,9 @@ class FrontController extends Controller
                         'tracks' => $tracks,
                         'year' => $year,
                         'month' => $month,
-                        'monthName' => strftime("%B", mktime(0, 0, 0, $month)),
+                        'monthName' => strftime('%B', mktime(0, 0, 0, $month)),
                         'day' => $day,
                     ]);
-
                 }
 
                 // Get tracks for current year
@@ -178,15 +174,15 @@ class FrontController extends Controller
                 $days = [];
                 foreach ($tracks as $track) {
                     $day = $track->getStartedAt()->format('d');
-                    if (isset($days[$day])){
-                        if (count($days[$day]["tracks"]) < 16){
-                            $days[$day]["tracks"][] = $track;
+                    if (isset($days[$day])) {
+                        if (count($days[$day]['tracks']) < 16) {
+                            $days[$day]['tracks'][] = $track;
                         }
                     } else {
                         $days[$day] = [
-                            "name" => $day,
-                            "key" => $track->getStartedAt()->format('d'),
-                            "tracks" => [$track]
+                            'name' => $day,
+                            'key' => $track->getStartedAt()->format('d'),
+                            'tracks' => [$track],
                         ];
                     }
                 }
@@ -195,25 +191,25 @@ class FrontController extends Controller
                     'days' => $days,
                     'year' => $year,
                     'month' => $month,
-                    'monthName' => strftime("%B", mktime(0, 0, 0, $month))
+                    'monthName' => strftime('%B', mktime(0, 0, 0, $month)),
                 ]);
             }
 
-             // Get tracks for current year
+            // Get tracks for current year
             $tracks = $this->get('doctrine')->getRepository(Track::class)->findByYear($year);
 
             $months = [];
             foreach ($tracks as $track) {
-                $month = strftime("%B", mktime(0, 0, 0, $track->getStartedAt()->format('m')));
-                if (isset($months[$month])){
-                    if (count($months[$month]["tracks"]) < 16){
-                        $months[$month]["tracks"][] = $track;
+                $month = strftime('%B', mktime(0, 0, 0, $track->getStartedAt()->format('m')));
+                if (isset($months[$month])) {
+                    if (count($months[$month]['tracks']) < 16) {
+                        $months[$month]['tracks'][] = $track;
                     }
                 } else {
                     $months[$month] = [
-                        "name" => $month,
-                        "key" => $track->getStartedAt()->format('m'),
-                        "tracks" => [$track]
+                        'name' => $month,
+                        'key' => $track->getStartedAt()->format('m'),
+                        'tracks' => [$track],
                     ];
                 }
             }
@@ -222,10 +218,8 @@ class FrontController extends Controller
                 'months' => $months,
                 'year' => $year,
             ]);
-
         }
 
-        return $this->redirectToRoute('archives', ["year" => date("Y")]);
-        
+        return $this->redirectToRoute('archives', ['year' => date('Y')]);
     }
 }
