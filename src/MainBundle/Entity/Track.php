@@ -48,6 +48,11 @@ class Track
     private $tuneefyLink;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $spotifyTrackId;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $valid;
@@ -251,5 +256,29 @@ class Track
     public function isValid()
     {
         return $this->valid;
+    }
+
+    /**
+     * Set spotifyTrackId
+     *
+     * @param string $spotifyTrackId
+     *
+     * @return Track
+     */
+    public function setSpotifyTrackId($spotifyTrackId)
+    {
+        $this->spotifyTrackId = $spotifyTrackId;
+
+        return $this;
+    }
+
+    /**
+     * Get spotifyTrackId
+     *
+     * @return string
+     */
+    public function getSpotifyTrackId()
+    {
+        return $this->spotifyTrackId;
     }
 }

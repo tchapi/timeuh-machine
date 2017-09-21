@@ -7,7 +7,7 @@
         "psr-4": {
             "MainBundle\\": "src/MainBundle"
         },
-        "classmap": [ "app/AppKernel.php", "app/AppCache.php" ]
+        "classmap": [ "app/AppKernel.php", "app/AppCache.php","vendor/jwilsson/spotify-web-api-php/src" ]
     },
     "autoload-dev": {
         "psr-4": { "Tests\\": "tests/" },
@@ -15,7 +15,7 @@
     },
     "require": {
         "php": ">=7.0",
-        "symfony/symfony": "3.2.*",
+        "symfony/symfony": "3.3.*",
         "doctrine/orm": "^2.5",
         "doctrine/doctrine-bundle": "^1.6",
         "doctrine/doctrine-cache-bundle": "^1.2",
@@ -25,7 +25,8 @@
         "sensio/distribution-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^3.0.2",
         "incenteev/composer-parameter-handler": "^2.0",
-        "beberlei/DoctrineExtensions": "^1.0"
+        "beberlei/DoctrineExtensions": "^1.0",
+        "jwilsson/spotify-web-api-php": "^2.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "^3.0",

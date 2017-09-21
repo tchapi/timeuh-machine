@@ -29,3 +29,7 @@ parameters:
     tuneefy_token: infiniteToken
     tuneefy_track_endpoint: "https://data.tuneefy.com/v2/aggregate/track?limit=1&aggressive&q=%s"
     tuneefy_share_endpoint: "https://data.tuneefy.com/v2/share/%s"
+
+    # For Spotify
+    spotify_client_id: test
+    spotify_client_secret: test

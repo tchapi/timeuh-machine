@@ -76,4 +76,37 @@ class TrackRepository extends EntityRepository
              ->getQuery()
              ->getResult();
     }
+
+    public function findSpotifyIdsForMonth($year,$month)
+    {
+        return $this->createQueryBuilder('t')
+             ->select('t.spotifyTrackId')
+             ->where('YEAR(t.startedAt) = :year')
+             ->setParameter('year', $year)
+             ->andWhere('MONTH(t.startedAt) = :month')
+             ->setParameter('month', $month)
+             ->andWhere('t.valid = 1')
+             ->andWhere('t.spotifyTrackId IS NOT NULL')
+             ->orderBy('t.startedAt', 'DESC')
+             ->getQuery()
+             ->getResult();
+    }
+
+    public function findSpotifyIdsForDay($year,$month, $day)
+    {
+        return $this->createQueryBuilder('t')
+             ->select('t.spotifyTrackId')
+             ->where('YEAR(t.startedAt) = :year')
+             ->setParameter('year', $year)
+             ->andWhere('MONTH(t.startedAt) = :month')
+             ->setParameter('month', $month)
+             ->andWhere('DAY(t.startedAt) = :day')
+             ->setParameter('day', $day)
+             ->andWhere('t.valid = 1')
+             ->andWhere('t.spotifyTrackId IS NOT NULL')
+             ->orderBy('t.startedAt', 'DESC')
+             ->getQuery()
+             ->getResult();
+    }
+
 }

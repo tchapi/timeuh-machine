@@ -43,3 +43,12 @@ body {
   font-size: 1.25em;
   margin: 2em;
 }
+
+.ui.button.spotify {
+  background: #2ebd59;
+  color: white;
+}
+
+.ui.container.message {
+  margin-bottom: 20px;
+}

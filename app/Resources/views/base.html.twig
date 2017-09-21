@@ -30,6 +30,18 @@
   </nav>
 </div>
 
+<div class="ui container">
+{% for label, messages in app.flashes %}
+     {% for message in messages %}
+        <div class="ui message positive">
+          <i class="close icon"></i>
+            <div class="header">{{ "playlist.message.header"|trans }}</div>
+            <p>{{ message }}</p>
+        </div>
+    {% endfor %}
+{% endfor %}
+</div>
+
 {% block content %}
 {% endblock %}
 

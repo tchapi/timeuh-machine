@@ -7,11 +7,11 @@
   <h1>{{ "archives.title"|trans }} > {{ year }}</h1>
 
   {% for month in months %}
-    <h2>{{ month.name|capitalize }} {{ year }}</h2>
+    <h2 id="{{ month.name }}">{{ month.name|capitalize }} {{ year }}</h2>
 
     <p>{% for track in month.tracks if track.artist %}{{ track.artist|capitalize }}, {% endfor %}{{ "archives.and.many.more"|trans }}</p>
 
-    <p><a href="{{ path('archives', {year: year, month: month.key}) }}" class="ui button green"><i class="ui icon music"></i> {{ "archives.see.all.this.month"|trans}}</a></p>
+    <p><a href="{{ path('archives', {year: year, month: month.key}) }}" class="ui button teal"><i class="ui icon music"></i> {{ "archives.see.all.this.month"|trans}}</a> <a href="{{ path('create_playlist', {year: year, month: month.key}) }}?referer={{ path('archives', {year: year}) }}#{{ month.name }}" class="ui button spotify"><i class="ui icon spotify"></i> {{ "playlist.create.month"|trans}}</a></p>
     <div class="ui eight cards">
       {% for track in month.tracks %}
       <div class="card">

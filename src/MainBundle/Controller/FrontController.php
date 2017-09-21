@@ -6,6 +6,8 @@ use MainBundle\Entity\Track;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * Main frontend controller for the website.
@@ -47,11 +49,110 @@ class FrontController extends Controller
     }
 
     /**
+     * @Route("/create/playlist/{year}/{month}/{day}", name="create_playlist", requirements={"year" = "\d+", "month" = "\d+", "day" = "\d+"})
+     */
+    public function intiateCreatePlaylist(Request $request, int $year = null, int $month = null, ?int $day = null)
+    {
+        // Get all the spotify tracks id
+        $repository = $this->get('doctrine')->getRepository(Track::class);
+
+        if ($month) {
+
+            if ($day) {
+                $tracks = $repository->findSpotifyIdsForDay($year, $month, $day);
+                $name = $this->get('translator')->trans('playlist.title.day', ["%date%" => $day."/".$month."/".$year]);
+            }
+            
+            $tracks = $repository->findSpotifyIdsForMonth($year, $month);
+            $name = $this->get('translator')->trans('playlist.title.month', ["%month%" => strftime("%B", mktime(0, 0, 0, $month)), "%year%" => $year]);
+        }
+
+        // flatten array
+        array_walk($tracks, function(&$item, $key){
+            $item = $item['spotifyTrackId'];
+        });
+
+        // Store the tracks, name of the playlist, playlist image and referer url in session
+        $session = $request->getSession();
+
+        $session->set('playlist', [
+                "name" =>  $name,
+                "tracks" => $tracks,
+                //"image" => "",
+            ]);
+        $session->set('referer', $request->get('referer')?:$this->generateUrl('archives'));
+
+        // Launch the login process
+        $spotifySession = new \SpotifyWebAPI\Session(
+            $this->getParameter('spotify_client_id'),
+            $this->getParameter('spotify_client_secret'),
+            $this->generateUrl('finalize_playlist', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+
+        $options = [
+            'scope' => [
+                'playlist-modify-public',
+            ],
+        ];
+
+        return $this->redirect($spotifySession->getAuthorizeUrl($options));
+    }
+
+    /**
+     * @Route("/finalize/playlist", name="finalize_playlist")
+     */
+    public function finalizeCreatePlaylist(Request $request)
+    {
+        // Retrieves the stored session info
+        $session = $request->getSession();
+
+        $playlist = $session->get('playlist');
+        $referer = $session->get('referer');
+
+        // Retrieve access token
+        $spotifySession = new \SpotifyWebAPI\Session(
+            $this->getParameter('spotify_client_id'),
+            $this->getParameter('spotify_client_secret'),
+            $this->generateUrl('finalize_playlist', [], UrlGeneratorInterface::ABSOLUTE_URL)
+        );
+        $api = new \SpotifyWebAPI\SpotifyWebAPI();
+
+        // Request a access token using the code from Spotify
+        $spotifySession->requestAccessToken($request->get('code'));
+        $accessToken = $spotifySession->getAccessToken();
+
+        // Set the access token on the API wrapper
+        $api->setAccessToken($accessToken);
+
+        // Get user id
+        $me = $api->me();
+
+        // Create playlist
+        $createdPlaylist = $api->createUserPlaylist($me->id, [
+            'name' => $playlist['name']
+        ]);
+
+        //$imageData = base64_encode(@file_get_contents($createdPlaylist['image']));
+        //$api->updateUserPlaylistImage($me->id, $createdPlaylist->id, $imageData);
+
+        // Add tracks
+        $api->addUserPlaylistTracks($me->id, $createdPlaylist->id, $playlist['tracks']);
+
+        // Redirect to page where the user was, with a popin
+        $this->addFlash(
+            'success',
+            $this->get('translator')->trans('playlist.message.message', ["%name%" => $playlist['name']])
+        );
+        return $this->redirect($referer);
+    }
+
+    /**
      * @Route("/archives/{year}/{month}/{day}", name="archives", requirements={"year" = "\d+", "month" = "\d+", "day" = "\d+"})
      */
     public function archivesAction(Request $request, ?int $year = null, ?int $month = null, ?int $day = null)
     {
         setlocale(LC_TIME, \Locale::getDefault(), 'fr','fr_FR','fr_FR@euro','fr_FR.utf8','fr-FR','fra');
+
         if ($year) {
 
             if ($month) {

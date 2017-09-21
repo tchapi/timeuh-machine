@@ -15,22 +15,32 @@ $(document).ready(function(){
     return elementBottom > viewportTop && elementTop - offset < viewportBottom;
   };
 
-  $(window).on('resize scroll', function() {
-      if ($("#loader").isInViewport() && canFetch) {
-        canFetch = false;
-        currentPage = currentPage + 1;
-        $.ajax({url: $("#loader").attr("data-href") + currentPage, success: function(result){
-          $(".music.cards").append(result);
-          canFetch = true
-          $('.music.cards .image').dimmer({
-            on: 'hover'
-          });
-        }});
-      }
-  });
+  if ($("#loader").length > 0) {
+    $(window).on('resize scroll', function() {
+        if ($("#loader").isInViewport() && canFetch) {
+          canFetch = false;
+          currentPage = currentPage + 1;
+          $.ajax({url: $("#loader").attr("data-href") + currentPage, success: function(result){
+            $(".music.cards").append(result);
+            canFetch = true
+            $('.music.cards .image').dimmer({
+              on: 'hover'
+            });
+          }});
+        }
+    });
+  }
 
   $('.music.cards .image').dimmer({
     on: 'hover'
+  });
+
+  $('.message .close')
+  .on('click', function() {
+    $(this)
+      .closest('.message')
+      .transition('fade')
+    ;
   });
 
 });
