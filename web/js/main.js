@@ -35,8 +35,10 @@ $(document).ready(function(){
     on: 'hover'
   });
 
-  $('.message .close').on('click', function() {
-    $(this).closest('.message').transition('fade');
-  });
+  $('.button.spotify').click(function(){
+    $(this).addClass('loading');
+  })
+
+  $('.ui.modal').modal('show');
 
 });

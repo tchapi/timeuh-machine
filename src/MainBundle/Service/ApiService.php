@@ -197,6 +197,7 @@ final class ApiService
                 $result = $this->getTuneefyLinkAndImage($t);
                 if ($result) {
                     $t->setTuneefyLink($result['link']);
+                    $t->setSpotifyLink($result['spotifyLink']);
                     if ($result['image']) {
                         $t->setImage($result['image']);
                     }
@@ -244,6 +245,13 @@ final class ApiService
         $intent = $data->results[0]->share->intent;
         $image = $data->results[0]->musical_entity->album->picture;
 
+        if (isset($data->results[0]->musical_entity->links->spotify)) {
+            $spotifyLink = $data->results[0]->musical_entity->links->spotify[0];
+            $spotifyLink = str_replace('https://open.spotify.com/track/', 'spotify:track:', $spotifyLink);
+        } else {
+            $spotifyLink = null;
+        }
+
         // Get the link
         $ch = curl_init();
 
@@ -267,6 +275,7 @@ final class ApiService
 
         return [
             'link' => $data->link,
+            'spotifyLink' => $spotifyLink,
             'image' => $image,
         ];
     }

@@ -50,7 +50,7 @@ class Track
     /**
      * @ORM\Column(type="string", nullable=true)
      */
-    private $spotifyTrackId;
+    private $spotifyLink;
 
     /**
      * @ORM\Column(type="boolean", nullable=true)
@@ -259,26 +259,26 @@ class Track
     }
 
     /**
-     * Set spotifyTrackId.
+     * Set spotifyLink.
      *
-     * @param string $spotifyTrackId
+     * @param string $spotifyLink
      *
      * @return Track
      */
-    public function setSpotifyTrackId($spotifyTrackId)
+    public function setSpotifyLink($spotifyLink)
     {
-        $this->spotifyTrackId = $spotifyTrackId;
+        $this->spotifyLink = $spotifyLink;
 
         return $this;
     }
 
     /**
-     * Get spotifyTrackId.
+     * Get spotifyLink.
      *
      * @return string
      */
-    public function getSpotifyTrackId()
+    public function getSpotifyLink()
     {
-        return $this->spotifyTrackId;
+        return $this->spotifyLink;
     }
 }
