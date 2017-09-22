@@ -29,11 +29,15 @@ playlist:
     day: "Créer une playlist de ce jour"
     month: "Créer une playlist de ce mois"
   title:
-    day: "Radiomeuh // %date%"
-    month: "Radiomeuh // %month% %year%"
+    day: "♬ Radiomeuh | %date%"
+    month: "♬ Radiomeuh | %month% %year%"
   message:
-    header: "Playlist créée avec succès"
-    message: "La playlist '%name%' a été ajoutée à votre compte — bonne écoute !"
+    header: "Playlists Spotify"
+    message_no_tracks: "Malheureusement, nous n'avons aucune piste sur Spotify pour cette période ... aucune playlist n'a été créée sur votre compte"
+    message_new: "La playlist « %name% » a été ajoutée à votre compte — bonne écoute !"
+    message_update: "La playlist « %name% » a été mise à jour avec les nouveaux titres — bonne écoute !"
+    ok: "Alright"
+    no_new_tracks: "La playlist « %name% » contient déjà toutes les pistes identifiées pour cette période, elle n'a pas été modifiée."
 
 about:
   title: "À propos"

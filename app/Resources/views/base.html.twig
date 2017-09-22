@@ -30,17 +30,25 @@
   </nav>
 </div>
 
-<div class="ui container">
 {% for label, messages in app.flashes %}
      {% for message in messages %}
-        <div class="ui message positive">
-          <i class="close icon"></i>
-            <div class="header">{{ "playlist.message.header"|trans }}</div>
+        <div class="ui basic modal">
+          <div class="ui icon header">
+            <i class="check icon"></i>
+            {{ "playlist.message.header"|trans }}
+          </div>
+          <div class="content">
             <p>{{ message }}</p>
+          </div>
+          <div class="actions">
+            <div class="ui green ok inverted button">
+              <i class="checkmark icon"></i>
+              {{ "playlist.message.ok"|trans }}
+            </div>
+          </div>
         </div>
     {% endfor %}
 {% endfor %}
-</div>
 
 {% block content %}
 {% endblock %}

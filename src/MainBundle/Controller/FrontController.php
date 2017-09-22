@@ -53,22 +53,33 @@ class FrontController extends Controller
      */
     public function intiateCreatePlaylist(Request $request, int $year = null, int $month = null, ?int $day = null)
     {
+        setlocale(LC_TIME, \Locale::getDefault(), 'fr', 'fr_FR', 'fr_FR@euro', 'fr_FR.utf8', 'fr-FR', 'fra');
+
         // Get all the spotify tracks id
         $repository = $this->get('doctrine')->getRepository(Track::class);
 
         if ($month) {
             if ($day) {
-                $tracks = $repository->findSpotifyIdsForDay($year, $month, $day);
-                $name = $this->get('translator')->trans('playlist.title.day', ['%date%' => $day.'/'.$month.'/'.$year]);
+                $tracks = $repository->findSpotifyLinksForDay($year, $month, $day);
+                $name = $this->get('translator')->trans('playlist.title.day', ['%date%' => strftime('%d/%m/%Y', mktime(0, 0, 0, $month, $day, $year))]);
+            } else {
+                $tracks = $repository->findSpotifyLinksForMonth($year, $month);
+                $name = $this->get('translator')->trans('playlist.title.month', ['%month%' => ucfirst(strftime('%B', mktime(0, 0, 0, $month))), '%year%' => $year]);
             }
+        }
 
-            $tracks = $repository->findSpotifyIdsForMonth($year, $month);
-            $name = $this->get('translator')->trans('playlist.title.month', ['%month%' => strftime('%B', mktime(0, 0, 0, $month)), '%year%' => $year]);
+        // If there is no spotify track
+        if (count($tracks) == 0) {
+            $this->addFlash(
+                'success',
+                $this->get('translator')->trans('playlist.message.message_no_tracks')
+            );
+            return $this->redirect($request->get('referer') ?: $this->generateUrl('archives'));
         }
 
         // flatten array
         array_walk($tracks, function (&$item, $key) {
-            $item = $item['spotifyTrackId'];
+            $item = $item['spotifyLink'];
         });
 
         // Store the tracks, name of the playlist, playlist image and referer url in session
@@ -77,7 +88,6 @@ class FrontController extends Controller
         $session->set('playlist', [
                 'name' => $name,
                 'tracks' => $tracks,
-                //"image" => "",
             ]);
         $session->set('referer', $request->get('referer') ?: $this->generateUrl('archives'));
 
@@ -126,23 +136,50 @@ class FrontController extends Controller
         // Get user id
         $me = $api->me();
 
-        // Create playlist
-        $createdPlaylist = $api->createUserPlaylist($me->id, [
-            'name' => $playlist['name'],
-        ]);
+        // If the playlist exists, find its id
+        $playlists = $api->getUserPlaylists($me->id);
 
-        //$imageData = base64_encode(@file_get_contents($createdPlaylist['image']));
-        //$api->updateUserPlaylistImage($me->id, $createdPlaylist->id, $imageData);
+        $spotifyPlaylistId = array_reduce($playlists->items, function ($carry, $existingPlaylist) use ($playlist) {
+            return ($existingPlaylist->name === $playlist['name']) ? $existingPlaylist->id : $carry;
+        }, null);
 
-        // Add tracks
-        $api->addUserPlaylistTracks($me->id, $createdPlaylist->id, $playlist['tracks']);
+        if (null !== $spotifyPlaylistId) {
+            // Unset tracks that are already in the playlist so we don't create duplicates
+            $playlistTracks = $api->getUserPlaylistTracks($me->id, $spotifyPlaylistId);
+            foreach ($playlistTracks->items as $track) {
+                if (false !== ($key = array_search($track->track->uri, $playlist['tracks']))) {
+                    unset($playlist['tracks'][$key]);
+                }
+            }
+            $playlist['tracks'] = array_values($playlist['tracks']);
+            if (count($playlist['tracks']) > 0) {
+                $this->addFlash(
+                    'success',
+                    $this->get('translator')->trans('playlist.message.message_update', ['%name%' => $playlist['name']])
+                );
+            } else {
+                $this->addFlash(
+                    'success',
+                    $this->get('translator')->trans('playlist.message.no_new_tracks', ['%name%' => $playlist['name']])
+                );
+                return $this->redirect($referer);
+            }
+        } else {
+            // Create playlist
+            $createdPlaylist = $api->createUserPlaylist($me->id, [
+                'name' => $playlist['name'],
+            ]);
+            $spotifyPlaylistId = $createdPlaylist->id;
+            $this->addFlash(
+                'success',
+                $this->get('translator')->trans('playlist.message.message_new', ['%name%' => $playlist['name']])
+            );
+        }
+
+        // Add tracks if any left
+        $api->addUserPlaylistTracks($me->id, $spotifyPlaylistId, $playlist['tracks']);
 
         // Redirect to page where the user was, with a popin
-        $this->addFlash(
-            'success',
-            $this->get('translator')->trans('playlist.message.message', ['%name%' => $playlist['name']])
-        );
-
         return $this->redirect($referer);
     }
 
