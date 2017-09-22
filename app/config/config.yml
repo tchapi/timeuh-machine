@@ -45,6 +45,8 @@ twig:
         website_link: "%website_link%"
         player_link: "%player_link%"
         bot_link: "%bot_link%"
+        track_endpoint: "%track_endpoint%"
+
 
 # Doctrine Configuration
 doctrine:

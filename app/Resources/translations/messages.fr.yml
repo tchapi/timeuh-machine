@@ -40,5 +40,6 @@ about:
   bot: "Le bot Telegram"
   build: "Le RadioMeuh «Pis»"
   website.open: "Aller sur le site de RadioMeuh"
-  player.open: "Ouvrir le player"
+  player.open: "Ouvrir le player en ligne"
   bot.open: "Ouvrir le bot"
+  donate: "Soutenez RadioMeuh !"
