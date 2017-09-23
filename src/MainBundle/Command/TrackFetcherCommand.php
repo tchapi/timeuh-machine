@@ -23,6 +23,12 @@ class TrackFetcherCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Does not fetch the last tracks but rather fix missing tuneefy information in the whole database'
+            )
+            ->addOption(
+                'fix-spotify',
+                null,
+                InputOption::VALUE_NONE,
+                'Does not fetch the last tracks but rather fix missing Spotify information in the whole database'
             );
     }
 
@@ -42,6 +48,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
                 $result = $apiService->getTuneefyLinkAndImage($track);
                 if ($result) {
                     $track->setTuneefyLink($result['link']);
+                    $track->setSpotifyLink($result['spotifyLink']);
                     if ($result['image']) {
                         $track->setImage($result['image']);
                     }
@@ -50,6 +57,30 @@ class TrackFetcherCommand extends ContainerAwareCommand
                     ++$counter;
                 } else {
                     $output->writeln('<error>No result.</error>');
+                }
+            }
+
+            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
+        } else if ($input->getOption('fix-spotify')) {
+            $output->writeln('<info>Fixing missing Spotify data in database</info>');
+            $tracks = $this->getContainer()->get('doctrine')->getRepository(Track::class)->findBy(['spotifyLink' => null, 'valid' => 1]);
+            $counter = 0;
+
+            foreach ($tracks as $track) {
+                $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+
+                if ($track->getTuneefyLink() != null) {
+                    $result = $apiService->getSpotifyLinkForTuneefyLink($track->getTuneefyLink());
+                    if ($result) {
+                        $track->setSpotifyLink($result);
+                        $em->flush();
+                        $output->writeln('<info>Done.</info>');
+                        ++$counter;
+                    } else {
+                        $output->writeln('<error>No result.</error>');
+                    }
+                } else {
+                    $output->writeln('<comment>No tuneefy link, skipping.</comment>');
                 }
             }
 

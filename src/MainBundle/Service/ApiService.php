@@ -279,4 +279,29 @@ final class ApiService
             'image' => $image,
         ];
     }
+
+    public function getSpotifyLinkForTuneefyLink(string $tuneefyLink): ?string
+    {
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_URL => $tuneefyLink."?format=json",
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$response) {
+            return null;
+        }
+
+        $data = json_decode($response, false);
+
+        if (!isset($data->links->spotify)) {
+            return null;
+        }
+
+        return str_replace('https://open.spotify.com/track/', 'spotify:track:', $data->links->spotify[0]);
+    }
 }
