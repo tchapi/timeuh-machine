@@ -61,7 +61,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
             }
 
             $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
-        } else if ($input->getOption('fix-spotify')) {
+        } elseif ($input->getOption('fix-spotify')) {
             $output->writeln('<info>Fixing missing Spotify data in database</info>');
             $tracks = $this->getContainer()->get('doctrine')->getRepository(Track::class)->findBy(['spotifyLink' => null, 'valid' => 1]);
             $counter = 0;
@@ -69,7 +69,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
             foreach ($tracks as $track) {
                 $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
-                if ($track->getTuneefyLink() != null) {
+                if (null != $track->getTuneefyLink()) {
                     $result = $apiService->getSpotifyLinkForTuneefyLink($track->getTuneefyLink());
                     if ($result) {
                         $track->setSpotifyLink($result);

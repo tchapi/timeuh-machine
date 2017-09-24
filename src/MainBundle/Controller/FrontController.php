@@ -69,11 +69,12 @@ class FrontController extends Controller
         }
 
         // If there is no spotify track
-        if (count($tracks) == 0) {
+        if (0 == count($tracks)) {
             $this->addFlash(
                 'success',
                 $this->get('translator')->trans('playlist.message.message_no_tracks')
             );
+
             return $this->redirect($request->get('referer') ?: $this->generateUrl('archives'));
         }
 
@@ -162,6 +163,7 @@ class FrontController extends Controller
                     'success',
                     $this->get('translator')->trans('playlist.message.no_new_tracks', ['%name%' => $playlist['name']])
                 );
+
                 return $this->redirect($referer);
             }
         } else {

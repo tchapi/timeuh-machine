@@ -286,7 +286,7 @@ final class ApiService
 
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => $tuneefyLink."?format=json",
+            CURLOPT_URL => $tuneefyLink.'?format=json',
         ]);
 
         $response = curl_exec($ch);
