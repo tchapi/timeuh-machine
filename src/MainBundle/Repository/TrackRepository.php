@@ -38,13 +38,26 @@ class TrackRepository extends EntityRepository
                  ->getResult();
     }
 
+    public function findByYears()
+    {
+        return $this->createQueryBuilder('t')
+             ->select('t.startedAt, t.image, t.title, t.album, t.artist, YEAR(t.startedAt) as year_n')
+             ->where('t.valid = 1')
+             ->orderBy('t.startedAt', 'DESC')
+             ->andWhere("t.image != ''")
+             ->getQuery()
+             ->getResult();
+    }
+
     public function findByYear($year)
     {
         return $this->createQueryBuilder('t')
+             ->select('t.startedAt, t.image, t.title, t.album, t.artist, MONTH(t.startedAt) as month_n')
              ->where('YEAR(t.startedAt) = :year')
              ->setParameter('year', $year)
              ->andWhere('t.valid = 1')
              ->orderBy('t.startedAt', 'DESC')
+             ->andWhere("t.image != ''")
              ->getQuery()
              ->getResult();
     }
@@ -52,12 +65,14 @@ class TrackRepository extends EntityRepository
     public function findByMonth($year, $month)
     {
         return $this->createQueryBuilder('t')
+             ->select('t.startedAt, t.image, t.title, t.album, t.artist, DAY(t.startedAt) as day_n')
              ->where('YEAR(t.startedAt) = :year')
              ->setParameter('year', $year)
              ->andWhere('MONTH(t.startedAt) = :month')
              ->setParameter('month', $month)
              ->andWhere('t.valid = 1')
              ->orderBy('t.startedAt', 'DESC')
+             ->andWhere("t.image != ''")
              ->getQuery()
              ->getResult();
     }
@@ -73,6 +88,7 @@ class TrackRepository extends EntityRepository
              ->setParameter('day', $day)
              ->andWhere('t.valid = 1')
              ->orderBy('t.startedAt', 'DESC')
+             ->andWhere("t.image != ''")
              ->getQuery()
              ->getResult();
     }

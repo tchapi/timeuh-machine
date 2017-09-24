@@ -207,12 +207,12 @@ class FrontController extends Controller
                     ]);
                 }
 
-                // Get tracks for current year
+                // Get tracks for current month
                 $tracks = $this->get('doctrine')->getRepository(Track::class)->findByMonth($year, $month);
 
                 $days = [];
                 foreach ($tracks as $track) {
-                    $day = $track->getStartedAt()->format('d');
+                    $day = $track["day_n"];
                     if (isset($days[$day])) {
                         if (count($days[$day]['tracks']) < 16) {
                             $days[$day]['tracks'][] = $track;
@@ -220,7 +220,7 @@ class FrontController extends Controller
                     } else {
                         $days[$day] = [
                             'name' => $day,
-                            'key' => $track->getStartedAt()->format('d'),
+                            'key' => $track["day_n"],
                             'tracks' => [$track],
                         ];
                     }
@@ -239,15 +239,15 @@ class FrontController extends Controller
 
             $months = [];
             foreach ($tracks as $track) {
-                $month = strftime('%B', mktime(0, 0, 0, $track->getStartedAt()->format('m')));
+                $month = $track["month_n"];
                 if (isset($months[$month])) {
                     if (count($months[$month]['tracks']) < 16) {
                         $months[$month]['tracks'][] = $track;
                     }
                 } else {
                     $months[$month] = [
-                        'name' => $month,
-                        'key' => $track->getStartedAt()->format('m'),
+                        'name' => strftime('%B', mktime(0, 0, 0, $track["month_n"])),
+                        'key' => $track["month_n"],
                         'tracks' => [$track],
                     ];
                 }
@@ -259,11 +259,11 @@ class FrontController extends Controller
             ]);
         } else {
             // Get all tracks
-            $tracks = $this->get('doctrine')->getRepository(Track::class)->findBy([], ['startedAt' => 'DESC']);
+            $tracks = $this->get('doctrine')->getRepository(Track::class)->findByYears();
 
             $years = [];
             foreach ($tracks as $track) {
-                $year = $track->getStartedAt()->format('Y');
+                $year = $track['year_n'];
                 if (isset($years[$year])) {
                     if (count($years[$year]['tracks']) < 16) {
                         $years[$year]['tracks'][] = $track;
