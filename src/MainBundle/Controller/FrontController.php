@@ -127,8 +127,17 @@ class FrontController extends Controller
         );
         $api = new \SpotifyWebAPI\SpotifyWebAPI();
 
+        if (!$request->query->has('code')) {
+            return $this->redirectToRoute('home');
+        }
+
         // Request a access token using the code from Spotify
-        $spotifySession->requestAccessToken($request->get('code'));
+        try {
+            $spotifySession->requestAccessToken($request->get('code'));
+        } catch(\SpotifyWebAPI\SpotifyWebAPIException $e) {
+            return $this->redirectToRoute('home');
+        }
+
         $accessToken = $spotifySession->getAccessToken();
 
         // Set the access token on the API wrapper
