@@ -178,8 +178,10 @@ class FrontController extends Controller
             );
         }
 
-        // Add tracks if any left
-        $api->addUserPlaylistTracks($me->id, $spotifyPlaylistId, $playlist['tracks']);
+        // Add tracks if any left, in batches of 80 (max is 100 on Spotify, but keep it safe)
+        foreach (array_chunk($playlist['tracks'], 80) as $tracks) {
+            $api->addUserPlaylistTracks($me->id, $spotifyPlaylistId, $tracks);
+        }
 
         // Redirect to page where the user was, with a popin
         return $this->redirect($referer);
