@@ -1,0 +1,35 @@
+{% extends "base.html.twig" %}
+{% set menu = 'archives' %}
+
+{% block content %}
+
+<div class="ui container">
+  <h1>{{ "archives.title"|trans }}</h1>
+
+  {% for year in years %}
+    <h2 id="year{{ year.name }}">{{ year.name }}</h2>
+
+    <p>{% for track in year.tracks if track.artist %}{{ track.artist|capitalize }}, {% endfor %}{{ "archives.and.many.more"|trans }}</p>
+
+    <p><a href="{{ path('archives', {year: year.name}) }}" class="ui button teal"><i class="ui icon music"></i> {{ "archives.see.all.this.year"|trans}}</a></p>
+    <div class="ui eight cards">
+      {% for track in year.tracks %}
+      <div class="card">
+        <div class="image">
+          <img src="{{ track.image?:asset('img/album_placeholder.png') }}">
+        </div>
+        <div class="content">
+          <div class="header ellipsis">{{ track.title?:("unknown.title"|trans) }}</div>
+          <div class="meta">
+            <div class="artist ellipsis"><i class="user blue circle icon"></i> {{ track.artist?:("unknown.artist"|trans) }}</div>
+            <div class="album ellipsis"><i class="music blue icon"></i> {{ track.album?:("unknown.album"|trans) }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+</div>
+
+{% endblock %}

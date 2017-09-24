@@ -20,6 +20,7 @@ home.title: "Accueil"
 archives:
   title: "Archives"
   and.many.more: " ... et bien plus encore !"
+  see.all.this.year: "Voir tous les titres passés cette année"
   see.all.this.month: "Voir tous les titres passés ce mois"
   see.all.this.day: "Voir tous les titres passés ce jour"
   titles.on.this.day: "Les titres passés le %day%"

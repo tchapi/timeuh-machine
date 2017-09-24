@@ -257,8 +257,28 @@ class FrontController extends Controller
                 'months' => $months,
                 'year' => $year,
             ]);
-        }
+        } else {
+            // Get all tracks
+            $tracks = $this->get('doctrine')->getRepository(Track::class)->findBy([], ['startedAt' => 'DESC']);
 
-        return $this->redirectToRoute('archives', ['year' => date('Y')]);
+            $years = [];
+            foreach ($tracks as $track) {
+                $year = $track->getStartedAt()->format('Y');
+                if (isset($years[$year])) {
+                    if (count($years[$year]['tracks']) < 16) {
+                        $years[$year]['tracks'][] = $track;
+                    }
+                } else {
+                    $years[$year] = [
+                        'name' => $year,
+                        'tracks' => [$track],
+                    ];
+                }
+            }
+
+            return $this->render('archives.years.html.twig', [
+                'years' => $years,
+            ]);
+        }
     }
 }
