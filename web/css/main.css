@@ -31,7 +31,6 @@ body {
 
 .ui.cards.home > .card > .image {
   background: black;
-  height: 208px;
   align-items: center;
   justify-content: center;
   display: flex;
@@ -49,8 +48,30 @@ body {
 .ui.button.spotify {
   background: #2ebd59;
   color: white;
+  margin-top: 10px;
 }
 
 .ui.container.message {
   margin-bottom: 20px;
+}
+
+/* MEDIA QUERIES */
+
+@media only screen and (max-width: 991px) and (min-width: 768px) {
+  .ui.items > .item > .image:not(.ui) {
+      height: 150px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .ui.very.relaxed.items.secondary.segment.piled > .item {
+      margin: auto;
+      padding: 1em 2em;
+  }
+}
+
+@media only screen and (max-width: 318px) {
+  body {
+    background: url(../img/logo.png) no-repeat 10px 20px #FFFFFF;
+    background-size: 300px;
+  }
 }
