@@ -12,7 +12,7 @@
     <p>{% for track in day.tracks if track.artist %}{{ track.artist|capitalize }}, {% endfor %}{{ "archives.and.many.more"|trans }}</p>
 
     <p><a href="{{ path('archives', {year: year, month: month, day: day.key}) }}" class="ui button teal"><i class="ui icon music"></i> {{ "archives.see.all.this.day"|trans}}</a> <a href="{{ path('create_playlist', {year: year, month: month, day: day.key}) }}?referer={{ path('archives', {year: year, month: month}) }}#{{ monthName }}{{ day.name }}" class="ui button spotify"><i class="ui icon spotify"></i> {{ "playlist.create.day"|trans}}</a></p>
-    <div class="ui eight cards">
+    <div class="ui eight cards doubling">
       {% for track in day.tracks %}
       <div class="card">
         <div class="image">

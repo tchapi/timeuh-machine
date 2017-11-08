@@ -12,7 +12,7 @@
     <p>{% for track in year.tracks if track.artist %}{{ track.artist|capitalize }}, {% endfor %}{{ "archives.and.many.more"|trans }}</p>
 
     <p><a href="{{ path('archives', {year: year.name}) }}" class="ui button teal"><i class="ui icon music"></i> {{ "archives.see.all.this.year"|trans}}</a></p>
-    <div class="ui eight cards">
+    <div class="ui eight cards doubling">
       {% for track in year.tracks %}
       <div class="card">
         <div class="image">
