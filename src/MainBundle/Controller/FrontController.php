@@ -6,6 +6,7 @@ use MainBundle\Entity\Track;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -22,6 +23,12 @@ class FrontController extends Controller
     public function homeAction(Request $request, int $page)
     {
         $page = ($page > 1) ? $page : 1;
+
+        // FIXME Remove when possible
+        if ($page > 8 && $request->isXmlHttpRequest()) {
+            return new Response();
+        }
+        // ENDf FIXME
 
         $trackRepository = $this->get('doctrine')->getRepository(Track::class);
 
