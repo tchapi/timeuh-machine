@@ -119,7 +119,7 @@ final class ApiService
         }
 
         // Is an episode of a podcast nevertheless ?
-        if (preg_match("/.*S[0-9]+\s?[\-\—]\s?Ep[0-9]+.*/", $title)) {
+        if (preg_match("/.*S[0-9]+\s?[\-\—]\s?Ep[0-9]+.*/", $title) || preg_match("/.*Episode\s[0-9]+.*/", $title)) {
             $track->setValid(false);
 
             return;
@@ -170,7 +170,7 @@ final class ApiService
             // the API result.
             $startingTime = new \Datetime($track->time);
 
-            if (intval($startingTime->format('H')) > 20 && 0 == intval((new \Datetime())->format('H'))) {
+            if (intval($startingTime->format('H')) > 20 && intval((new \Datetime())->format('H')) < 2) {
                 // We have hit a track that was played yesterday, and not today
                 // Post 20:00, if we're the day after, suppose that it was yesterday
                 $startingTime->sub(new \DateInterval('P1D'));
