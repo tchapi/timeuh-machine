@@ -134,7 +134,7 @@ class FrontController extends Controller
         // Request a access token using the code from Spotify
         try {
             $spotifySession->requestAccessToken($request->get('code'));
-        } catch(\SpotifyWebAPI\SpotifyWebAPIException $e) {
+        } catch (\SpotifyWebAPI\SpotifyWebAPIException $e) {
             return $this->redirectToRoute('home');
         }
 
@@ -223,7 +223,7 @@ class FrontController extends Controller
 
                 $days = [];
                 foreach ($tracks as $track) {
-                    $day = $track["day_n"];
+                    $day = $track['day_n'];
                     if (isset($days[$day])) {
                         if (count($days[$day]['tracks']) < 16) {
                             $days[$day]['tracks'][] = $track;
@@ -231,7 +231,7 @@ class FrontController extends Controller
                     } else {
                         $days[$day] = [
                             'name' => $day,
-                            'key' => $track["day_n"],
+                            'key' => $track['day_n'],
                             'tracks' => [$track],
                         ];
                     }
@@ -250,15 +250,15 @@ class FrontController extends Controller
 
             $months = [];
             foreach ($tracks as $track) {
-                $month = $track["month_n"];
+                $month = $track['month_n'];
                 if (isset($months[$month])) {
                     if (count($months[$month]['tracks']) < 16) {
                         $months[$month]['tracks'][] = $track;
                     }
                 } else {
                     $months[$month] = [
-                        'name' => strftime('%B', mktime(0, 0, 0, $track["month_n"])),
-                        'key' => $track["month_n"],
+                        'name' => strftime('%B', mktime(0, 0, 0, $track['month_n'])),
+                        'key' => $track['month_n'],
                         'tracks' => [$track],
                     ];
                 }
