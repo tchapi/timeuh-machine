@@ -2,7 +2,7 @@
 
 namespace Deployer;
 
-require 'recipe/symfony3.php';
+require 'recipe/symfony4.php';
 
 task('deploy', [
     'deploy:prepare',
@@ -42,12 +42,6 @@ set('clear_paths', [
   './composer.*',
 ]);
 
-// Tasks
-desc('Deploy production parameters');
-task('deploy:parameters', function () {
-    upload('./deploy/parameters.{{env}}.yml', '{{deploy_path}}/shared/app/config/parameters.yml');
-});
-
 desc('Restart PHP-FPM service');
 task('php-fpm:restart', function () {
     // The user must have rights for restart service
@@ -71,5 +65,4 @@ task('deploy:crontab', function () {
 after('deploy', 'success');
 after('deploy:symlink', 'php-fpm:restart');
 after('deploy:symlink', 'deploy:crontab');
-after('deploy:update_code', 'deploy:parameters');
 after('deploy:failed', 'deploy:unlock');

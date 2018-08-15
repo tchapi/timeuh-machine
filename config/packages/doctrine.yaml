@@ -1,0 +1,46 @@
+parameters:
+    # Adds a fallback DATABASE_URL if the env var is not set.
+    # This allows you to run cache:warmup even if your
+    # environment variables are not available yet.
+    # You should not need to change this value.
+    env(DATABASE_URL): ''
+
+doctrine:
+    dbal:
+        # configure these for your database server
+        driver: 'pdo_mysql'
+        server_version: '5.7'
+        charset: utf8mb4
+        default_table_options:
+            charset: utf8mb4
+            collate: utf8mb4_unicode_ci
+
+        url: '%env(resolve:DATABASE_URL)%'
+    orm:
+        auto_generate_proxy_classes: '%kernel.debug%'
+        naming_strategy: doctrine.orm.naming_strategy.underscore
+        auto_mapping: true
+        mappings:
+            App:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Entity'
+                prefix: 'App\Entity'
+                alias: App
+        dql:
+            string_functions:
+                MONTH: DoctrineExtensions\Query\Mysql\Month
+                YEAR: DoctrineExtensions\Query\Mysql\Year
+                DAY: DoctrineExtensions\Query\Mysql\Day
+            datetime_functions:
+                convert_tz: DoctrineExtensions\Query\Mysql\ConvertTz
+                date: DoctrineExtensions\Query\Mysql\Date
+                date_format: DoctrineExtensions\Query\Mysql\DateFormat
+                dateadd: DoctrineExtensions\Query\Mysql\DateAdd
+                datesub: DoctrineExtensions\Query\Mysql\DateSub
+                datediff: DoctrineExtensions\Query\Mysql\DateDiff
+                time: DoctrineExtensions\Query\Mysql\Time
+                timediff: DoctrineExtensions\Query\Mysql\TimeDiff
+                timestampadd: DoctrineExtensions\Query\Mysql\TimestampAdd
+                timestampdiff: DoctrineExtensions\Query\Mysql\TimestampDiff
+                timetosec: DoctrineExtensions\Query\Mysql\TimeToSec
