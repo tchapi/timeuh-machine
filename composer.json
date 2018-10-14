@@ -16,6 +16,7 @@
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.1",
         "symfony/lts": "^4@dev",
+        "symfony/monolog-bundle": "^3.3",
         "symfony/orm-pack": "^1.0",
         "symfony/translation": "^4.1",
         "symfony/twig-bundle": "^4.1",
