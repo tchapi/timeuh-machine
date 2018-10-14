@@ -10,8 +10,6 @@ set('ssh_multiplexing', true);
 // Configuration
 inventory('deploy/servers.yml');
 
-set('env_vars', 'APP_ENV=prod');
-
 set('env', function () {
     return [
         'APP_ENV' => 'prod',
@@ -44,12 +42,20 @@ task('php-fpm:restart', function () {
     run('sudo systemctl restart php7.1-fpm.service');
 });
 
-// Draft crontab
+// Command crontab
+/*
+/!\ A.env file must exist with the following syntax :
+
+    export APP_ENV=prod
+    export ..
+
+in the deployment directory
+*/
 desc('Add crontab for fetch-tracks');
 task('deploy:crontab', function () {
     cd('/var/tmp');
     run('echo -n > deploy.crontab');
-    run('echo \'*/10 * * * * {{env_vars}} {{bin/php}} {{current_path}}/bin/console timeuh-machine:fetch-tracks --env=prod >> /dev/null 2>&1\' >> deploy.crontab');
+    run('echo \'*/10 * * * * . {{deploy_path}}/.env && {{bin/php}} {{current_path}}/bin/console timeuh-machine:fetch-tracks --env=prod >> /dev/null 2>&1\' >> deploy.crontab');
     run('cat deploy.crontab | crontab');
     $output = run('crontab -l');
     run('rm deploy.crontab');
