@@ -201,7 +201,7 @@ class FrontController extends Controller
      */
     public function archivesAction(Request $request, ?int $year = null, ?int $month = null, ?int $day = null)
     {
-        setlocale(LC_TIME, \Locale::getDefault(), 'fr', 'fr_FR', 'fr_FR@euro', 'fr_FR.utf8', 'fr-FR', 'fra');
+        setlocale(LC_TIME, $request->getLocale(), 'fr', 'fr_FR', 'fr_FR@euro', 'fr_FR.utf8', 'fr-FR', 'fra');
 
         if ($year) {
             if ($month) {
