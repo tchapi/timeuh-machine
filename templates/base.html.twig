@@ -25,7 +25,7 @@
   <nav class="ui text menu">
     <!-- <div class="header item">Timeuh Machine</div> -->
     <a class="item{% if menu == "home" %} active{% endif %}" href="{{ path('home') }}"><i class="ui icon home"></i> {{ "home.title"|trans }}</a>
-    <!--<a class="item{% if menu == "archives" %} active{% endif %}" href="{{ path('archives') }}"><i class="ui icon music"></i> {{ "archives.title"|trans }}</a>-->
+    <a class="item{% if menu == "archives" %} active{% endif %}" href="{{ path('archives') }}"><i class="ui icon music"></i> {{ "archives.title"|trans }}</a>
     <a class="item{% if menu == "about" %} active{% endif %}" href="{{ path('about') }}"><i class="ui icon circle info"></i> {{ "about.title"|trans }}</a>
   </nav>
 </div>
