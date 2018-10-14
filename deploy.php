@@ -4,34 +4,29 @@ namespace Deployer;
 
 require 'recipe/symfony4.php';
 
-task('deploy', [
-    'deploy:prepare',
-    'deploy:lock',
-    'deploy:release',
-    'deploy:update_code',
-    'deploy:create_cache_dir',
-    'deploy:shared',
-    'deploy:assets',
-    'deploy:vendors',
-    'deploy:assets:install',
-    'deploy:assetic:dump',
-    'deploy:cache:warmup',
-    'deploy:writable',
-    'deploy:clear_paths', // This has moved down the line
-    'deploy:symlink',
-    'deploy:unlock',
-    'cleanup',
-]);
-
-// Configuration
-serverList('deploy/servers.yml');
-
-set('env_vars', 'SYMFONY_ENV=prod');
 set('ssh_type', 'native');
 set('ssh_multiplexing', true);
+
+// Configuration
+inventory('deploy/servers.yml');
+
+set('env_vars', 'APP_ENV=prod');
+
+set('env', function () {
+    return [
+        'APP_ENV' => 'prod',
+        'TUNEEFY_TOKEN' => 'NA',
+        'SPOTIFY_CLIENT_ID' => 'NA',
+        'SPOTIFY_CLIENT_SECRET' => 'NA',
+        'GA_TRACKER_ID' => '0',
+        'DATABASE_URL' => 'null'
+    ];
+});
+
 set('http_user', 'www-data');
 set('default_stage', 'production');
 set('repository', 'git@github.com:tchapi/timeuh-machine.git');
+
 set('clear_paths', [
   './README.md',
   './.gitignore',
@@ -39,7 +34,7 @@ set('clear_paths', [
   './deploy',
   './.php_cs',
   './deploy.php',
-  './composer.*',
+  './.env*',
 ]);
 
 desc('Restart PHP-FPM service');

@@ -7,7 +7,7 @@ imports:
     - { resource: "services/excludes.yml" }
 
 parameters:
-    ga_tracker_id: "%env(ga_tracker_id)%"
+    ga_tracker_id: "%env(GA_TRACKER_ID)%"
     tracks_per_page: 20
     track_endpoint: 'http://player.radiomeuh.com/rtdata/tracks.xml'
     website_link: 'http://radiomeuh.com'
@@ -15,9 +15,9 @@ parameters:
     bot_link: 'http://t.me/RadioMeuhBot'
     tuneefy_track_endpoint: 'https://data.tuneefy.com/v2/aggregate/track?limit=1&aggressive&q=%s'
     tuneefy_share_endpoint: 'https://data.tuneefy.com/v2/share/%s'
-    tuneefy_token: "%env(tuneefy_token)%"
-    spotify_client_id: "%env(spotify_client_id)%"
-    spotify_client_secret: "%env(spotify_client_secret)%"
+    tuneefy_token: "%env(TUNEEFY_TOKEN)%"
+    spotify_client_id: "%env(SPOTIFY_CLIENT_ID)%"
+    spotify_client_secret: "%env(SPOTIFY_CLIENT_SECRET)%"
     locale: 'fr'
 
 services:
