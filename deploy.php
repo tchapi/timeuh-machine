@@ -63,7 +63,6 @@ task('deploy:crontab', function () {
 });
 
 // Hooks
-after('deploy', 'success');
 after('deploy:symlink', 'php-fpm:restart');
 after('deploy:symlink', 'deploy:crontab');
 after('deploy:failed', 'deploy:unlock');
