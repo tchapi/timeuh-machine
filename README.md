@@ -28,3 +28,17 @@ This is the Timeuh Machine
   <h3>Légal</h3>
 
   <p>Tu es de RadioMeuh ? J'ai fait un truc qui fallait pas faire ? Vraiment le logo ca va pas du tout, <strong>je dois l'enlever</strong> ? Les huissiers arrivent ? Aucun souci, je suis dispo pour en parler : <a href="mailto:tchap[at]tchap[dot]me">mail</a></p>
+
+ - - -
+
+  <h3>Développement</h3>
+
+  Tu veux me donner un coup de main pour améliorer cet outil ? Rien de plus simple, clone le repo et :
+
+      composer install
+      php -S localhost:9000 -t public
+      # L'interface est maintenant dispo à http://localhost:9000
+
+Basé sur [Symfony 4](https://symfony.com/).
+
+Toutes les pull requests sont les bienvenues !
