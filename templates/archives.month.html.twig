@@ -16,7 +16,7 @@
       {% for track in day.tracks %}
       <div class="card">
         <div class="image">
-          <img src="{{ track.image?:asset('img/album_placeholder.png') }}">
+          <img src="{{ track.image?:asset('img/album_placeholder.png') }}" onerror="this.src='{{ asset('img/album_placeholder.png') }}'">
         </div>
         <div class="content">
           <div class="header ellipsis">{{ track.title?:("unknown.title"|trans) }}</div>
