@@ -34,6 +34,7 @@ set('clear_paths', [
   './deploy.php',
   './.env*',
 ]);
+set('writable_mode', "chmod");
 
 desc('Restart PHP-FPM service');
 task('php-fpm:restart', function () {
