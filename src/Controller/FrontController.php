@@ -16,6 +16,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class FrontController extends Controller
 {
+    const STARTING_YEAR = 2017;
+
     /**
      * @Route("/{page}", name="home", requirements={"page" = "\d+"}, defaults={"page" = 1})
      */
@@ -246,20 +248,20 @@ class FrontController extends Controller
             }
 
             // Get tracks for current year
-            $tracks = $this->get('doctrine')->getRepository(Track::class)->findByYear($year);
+            $tracks = $this->get('doctrine')->getRepository(Track::class)->findLatestByMonths($year);
 
             $months = [];
             foreach ($tracks as $track) {
                 $month = $track['month_n'];
                 if (isset($months[$month])) {
                     if (count($months[$month]['tracks']) < 16) {
-                        $months[$month]['tracks'][] = $track;
+                        $months[$month]['tracks'][] = $track[0];
                     }
                 } else {
                     $months[$month] = [
                         'name' => strftime('%B', mktime(0, 0, 0, $track['month_n'])),
                         'key' => $track['month_n'],
-                        'tracks' => [$track],
+                        'tracks' => [$track[0]],
                     ];
                 }
             }
@@ -269,20 +271,20 @@ class FrontController extends Controller
                 'year' => $year,
             ]);
         } else {
-            // Get all tracks
-            $tracks = $this->get('doctrine')->getRepository(Track::class)->findByYears();
+            // Get all tracks for all years passed
+            $tracks = $this->get('doctrine')->getRepository(Track::class)->findLatestByYears(range(date('Y'), self::STARTING_YEAR));
 
-            $years = [];
+            // Sort tracks by YEAR properly
             foreach ($tracks as $track) {
                 $year = $track['year_n'];
                 if (isset($years[$year])) {
                     if (count($years[$year]['tracks']) < 16) {
-                        $years[$year]['tracks'][] = $track;
+                        $years[$year]['tracks'][] = $track[0];
                     }
                 } else {
                     $years[$year] = [
                         'name' => $year,
-                        'tracks' => [$track],
+                        'tracks' => [$track[0]],
                     ];
                 }
             }
