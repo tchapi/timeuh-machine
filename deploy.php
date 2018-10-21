@@ -54,13 +54,9 @@ in the deployment directory
 */
 desc('Add crontab for fetch-tracks');
 task('deploy:crontab', function () {
-    cd('/var/tmp');
-    run('echo -n > deploy.crontab');
-    run('echo \'*/10 * * * * . {{deploy_path}}/.env && {{bin/php}} {{current_path}}/bin/console timeuh-machine:fetch-tracks --env=prod >> /dev/null 2>&1\' >> deploy.crontab');
-    run('cat deploy.crontab | crontab');
-    $output = run('crontab -l');
-    run('rm deploy.crontab');
-    writeln('<info>' . $output . '</info>');
+    cd('/etc/cron.d/');
+    run('echo \'*/10 * * * * . {{deploy_path}}/.env && {{bin/php}} {{current_path}}/bin/console timeuh-machine:fetch-tracks --env=prod >> /dev/null 2>&1\' | sudo tee timeuh-machine.cron');
+    writeln('<info>Wrote /etc/cron.d/timeuh-machine.cron</info>');
 });
 
 // Hooks
