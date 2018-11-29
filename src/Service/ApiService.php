@@ -279,6 +279,10 @@ final class ApiService
 
         $data = json_decode($response);
 
+        if (!$data) {
+            return null;
+        }
+
         return [
             'link' => $data->link,
             'spotifyLink' => $spotifyLink,
