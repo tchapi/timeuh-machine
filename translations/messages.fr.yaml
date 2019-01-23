@@ -31,7 +31,7 @@ playlist:
     month: "Créer une playlist de ce mois"
   title:
     day: "♬ Radiomeuh | %date%"
-    month: "♬ Radiomeuh | %year%/%m% %month%"
+    month: "♬ Radiomeuh | %year% — %month%"
   message:
     header: "Playlists Spotify"
     message_no_tracks: "Malheureusement, nous n'avons aucune piste sur Spotify pour cette période ... aucune playlist n'a été créée sur votre compte"
