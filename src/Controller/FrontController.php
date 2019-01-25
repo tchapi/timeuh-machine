@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Track;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @author Cyril Chapellier
  */
-class FrontController extends Controller
+class FrontController extends AbstractController
 {
     const STARTING_YEAR = 2017;
 

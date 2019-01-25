@@ -4,12 +4,12 @@ namespace App\Command;
 
 use App\Entity\Track;
 use App\Service\ApiService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TrackFetcherCommand extends ContainerAwareCommand
+class TrackFetcherCommand extends Command
 {
     private $output;
 
