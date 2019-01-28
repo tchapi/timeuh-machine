@@ -4,10 +4,24 @@ namespace App\Repository;
 
 use App\Entity\Track;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 class TrackRepository extends EntityRepository
 {
+    private function getTrackResultSetMapping()
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addEntityResult(\App\Entity\Track::class, 't');
+        $rsm->addFieldResult('t', 'id', 'id');
+        $rsm->addFieldResult('t', 'title', 'title');
+        $rsm->addFieldResult('t', 'album', 'album');
+        $rsm->addFieldResult('t', 'artist', 'artist');
+        $rsm->addFieldResult('t', 'image', 'image');
+
+        return $rsm;
+    }
+
     public function findCurrentlyPlayingTrack()
     {
         $limit = new \Datetime('now - 30 minutes');
@@ -39,56 +53,49 @@ class TrackRepository extends EntityRepository
                  ->getResult();
     }
 
-    public function findLatestByYears(array $years)
+    public function findHighlightsByYears()
     {
-        // All this thanks to https://www.wanadev.fr/56-comment-realiser-de-belles-requetes-sql-avec-doctrine/
-        $table = $this->getClassMetadata()->table['name'];
+        $select = 'SELECT id, title, album, artist, image, year_n FROM years_mv';
 
-        // Create UNION query
-        $select = 'SELECT t.*, YEAR(t.started_at) as year_n FROM '.$table.' AS t';
-        $where = "WHERE t.valid = 1 AND t.image != '' AND YEAR(t.started_at) = :year";
-        $orderBy = 'LIMIT 16';
-
-        $queries = [];
-        foreach ($years as $year) {
-            $queries[] = '('.str_replace(':year', $year, $select.' '.$where.' '.$orderBy).')';
-        }
-
-        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
-        $rsm->addEntityResult(\App\Entity\Track::class, 't');
-        foreach ($this->getClassMetadata()->fieldMappings as $obj) {
-            $rsm->addFieldResult('t', $obj['columnName'], $obj['fieldName']);
-        }
+        $rsm = $this->getTrackResultSetMapping();
         $rsm->addScalarResult('year_n', 'year_n');
 
-        return $this->getEntityManager()->createNativeQuery(implode(' UNION ALL ', $queries), $rsm)->getResult();
+        $query = $this->getEntityManager()->createNativeQuery($select, $rsm);
+
+        return $query->getResult();
     }
 
-    public function findLatestByMonths(int $year)
+    public function findHighlightsByMonths(int $year)
     {
-        $table = $this->getClassMetadata()->table['name'];
+        $select = 'SELECT id, title, album, artist, image, year_n, month_n FROM months_mv WHERE year_n = ?';
 
-        // Create UNION query
-        $select = 'SELECT t.*, MONTH(t.started_at) as month_n FROM '.$table.' AS t';
-        $where = "WHERE t.valid = 1 AND t.image != '' AND YEAR(t.started_at) = ".$year.' AND MONTH(t.started_at) = :month';
-        $orderBy = 'LIMIT 16';
-
-        $queries = [];
-        foreach (range(1, 12) as $month) {
-            $queries[] = '('.str_replace(':month', $month, $select.' '.$where.' '.$orderBy).')';
-        }
-
-        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
-        $rsm->addEntityResult(\App\Entity\Track::class, 't');
-        foreach ($this->getClassMetadata()->fieldMappings as $obj) {
-            $rsm->addFieldResult('t', $obj['columnName'], $obj['fieldName']);
-        }
+        $rsm = $this->getTrackResultSetMapping();
+        $rsm->addScalarResult('year_n', 'year_n');
         $rsm->addScalarResult('month_n', 'month_n');
 
-        return $this->getEntityManager()->createNativeQuery(implode(' UNION ALL ', $queries), $rsm)->getResult();
+        $query = $this->getEntityManager()->createNativeQuery($select, $rsm);
+        $query->setParameter(1, $year);
+
+        return $query->getResult();
     }
 
-    public function findByMonth($year, $month)
+    public function findHighlightsByDays(int $year, int $month)
+    {
+        $select = 'SELECT id, title, album, artist, image, year_n, month_n, day_n FROM days_mv WHERE year_n = ? AND month_n = ?';
+
+        $rsm = $this->getTrackResultSetMapping();
+        $rsm->addScalarResult('year_n', 'year_n');
+        $rsm->addScalarResult('month_n', 'month_n');
+        $rsm->addScalarResult('day_n', 'day_n');
+
+        $query = $this->getEntityManager()->createNativeQuery($select, $rsm);
+        $query->setParameter(1, $year);
+        $query->setParameter(2, $month);
+
+        return $query->getResult();
+    }
+
+    public function findByMonth(int $year, int $month)
     {
         return $this->createQueryBuilder('t')
              ->select('t.startedAt, t.image, t.title, t.album, t.artist, DAY(t.startedAt) as day_n')
