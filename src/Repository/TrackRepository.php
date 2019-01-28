@@ -61,7 +61,7 @@ class TrackRepository extends EntityRepository
 
     public function findHighlightsByYears()
     {
-        $select = 'SELECT id, title, album, artist, image, year_n FROM years_mv';
+        $select = 'SELECT id, title, album, artist, image, year_n FROM years_mv ORDER BY year_n DESC';
 
         $rsm = $this->getTrackResultSetMapping();
         $rsm->addScalarResult('year_n', 'year_n');
@@ -73,7 +73,7 @@ class TrackRepository extends EntityRepository
 
     public function findHighlightsByMonths(int $year)
     {
-        $select = 'SELECT id, title, album, artist, image, year_n, month_n FROM months_mv WHERE year_n = ?';
+        $select = 'SELECT id, title, album, artist, image, month_n FROM months_mv WHERE year_n = ? ORDER BY month_n DESC';
 
         $rsm = $this->getTrackResultSetMapping();
         $rsm->addScalarResult('year_n', 'year_n');
@@ -87,7 +87,7 @@ class TrackRepository extends EntityRepository
 
     public function findHighlightsByDays(int $year, int $month)
     {
-        $select = 'SELECT id, title, album, artist, image, year_n, month_n, day_n FROM days_mv WHERE year_n = ? AND month_n = ?';
+        $select = 'SELECT id, title, album, artist, image, day_n FROM days_mv WHERE year_n = ? AND month_n = ? ORDER BY day_n DESC';
 
         $rsm = $this->getTrackResultSetMapping();
         $rsm->addScalarResult('year_n', 'year_n');
