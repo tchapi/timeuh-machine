@@ -3,13 +3,15 @@
 namespace App\Command;
 
 use App\Entity\Track;
+use App\Repository\TrackRepository;
 use App\Service\ApiService;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TrackFetcherCommand extends ContainerAwareCommand
+class TrackFetcherCommand extends Command
 {
     private $output;
 
@@ -18,9 +20,15 @@ class TrackFetcherCommand extends ContainerAwareCommand
      */
     private $apiService;
 
-    public function __construct(ApiService $apiService)
+    /**
+     * @var EntityManagerInterface
+     */
+    private $em;
+
+    public function __construct(ApiService $apiService, EntityManagerInterface $em)
     {
         $this->apiService = $apiService;
+        $this->em = $em;
         parent::__construct();
     }
 
@@ -40,16 +48,27 @@ class TrackFetcherCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Does not fetch the last tracks but rather fix missing Spotify information in the whole database'
+            )
+            ->addOption(
+                'from-date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Restrict fixing missing tracks to the tracks that have been created after the date passed'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $trackRepository = $this->em->getRepository(Track::class);
+
+        if ($input->getOption('from-date')) {
+            $fromDate = new \DateTime($input->getOption('from-date'));
+            $output->writeln('<comment>Fetching tracks after '.$fromDate->format('d/m/Y').'</comment>');
+        }
 
         if ($input->getOption('fix-missing')) {
             $output->writeln('<info>Fixing missing data in database</info>');
-            $tracks = $this->getContainer()->get('doctrine')->getRepository(Track::class)->findBy(['tuneefyLink' => null, 'valid' => 1]);
+            $tracks = $trackRepository->findMissingTracksFrom(TrackRepository::MISSING_TUNEEFY, $fromDate ?? null);
             $counter = 0;
 
             foreach ($tracks as $track) {
@@ -62,7 +81,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
                     if ($result['image']) {
                         $track->setImage($result['image']);
                     }
-                    $em->flush();
+                    $this->em->flush();
                     $output->writeln('<info>Done.</info>');
                     ++$counter;
                 } else {
@@ -73,7 +92,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
             $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
         } elseif ($input->getOption('fix-spotify')) {
             $output->writeln('<info>Fixing missing Spotify data in database</info>');
-            $tracks = $this->getContainer()->get('doctrine')->getRepository(Track::class)->findBy(['spotifyLink' => null, 'valid' => 1]);
+            $tracks = $trackRepository->findMissingTracksFrom(TrackRepository::MISSING_SPOTIFY, $fromDate ?? null);
             $counter = 0;
 
             foreach ($tracks as $track) {
@@ -83,7 +102,7 @@ class TrackFetcherCommand extends ContainerAwareCommand
                     $result = $this->apiService->getSpotifyLinkForTuneefyLink($track->getTuneefyLink());
                     if ($result) {
                         $track->setSpotifyLink($result);
-                        $em->flush();
+                        $this->em->flush();
                         $output->writeln('<info>Done.</info>');
                         ++$counter;
                     } else {

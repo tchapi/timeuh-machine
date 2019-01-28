@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Track;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
@@ -14,10 +14,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @author Cyril Chapellier
  */
-class FrontController extends Controller
+class FrontController extends AbstractController
 {
-    const STARTING_YEAR = 2017;
-
     /**
      * @Route("/{page}", name="home", requirements={"page" = "\d+"}, defaults={"page" = 1})
      */
@@ -221,20 +219,18 @@ class FrontController extends Controller
                 }
 
                 // Get tracks for current month
-                $tracks = $this->get('doctrine')->getRepository(Track::class)->findByMonth($year, $month);
+                $tracks = $this->get('doctrine')->getRepository(Track::class)->findHighlightsByDays($year, $month);
 
                 $days = [];
                 foreach ($tracks as $track) {
                     $day = $track['day_n'];
                     if (isset($days[$day])) {
-                        if (count($days[$day]['tracks']) < 16) {
-                            $days[$day]['tracks'][] = $track;
-                        }
+                        $days[$day]['tracks'][] = $track[0];
                     } else {
                         $days[$day] = [
                             'name' => $day,
-                            'key' => $track['day_n'],
-                            'tracks' => [$track],
+                            'key' => $day,
+                            'tracks' => [$track[0]],
                         ];
                     }
                 }
@@ -248,15 +244,13 @@ class FrontController extends Controller
             }
 
             // Get tracks for current year
-            $tracks = $this->get('doctrine')->getRepository(Track::class)->findLatestByMonths($year);
+            $tracks = $this->get('doctrine')->getRepository(Track::class)->findHighlightsByMonths($year);
 
             $months = [];
             foreach ($tracks as $track) {
                 $month = $track['month_n'];
                 if (isset($months[$month])) {
-                    if (count($months[$month]['tracks']) < 16) {
-                        $months[$month]['tracks'][] = $track[0];
-                    }
+                    $months[$month]['tracks'][] = $track[0];
                 } else {
                     $months[$month] = [
                         'name' => strftime('%B', mktime(0, 0, 0, $track['month_n'])),
@@ -272,15 +266,14 @@ class FrontController extends Controller
             ]);
         } else {
             // Get all tracks for all years passed
-            $tracks = $this->get('doctrine')->getRepository(Track::class)->findLatestByYears(range(date('Y'), self::STARTING_YEAR));
+            $tracks = $this->get('doctrine')->getRepository(Track::class)->findHighlightsByYears();
 
             // Sort tracks by YEAR properly
+            $years = [];
             foreach ($tracks as $track) {
                 $year = $track['year_n'];
                 if (isset($years[$year])) {
-                    if (count($years[$year]['tracks']) < 16) {
-                        $years[$year]['tracks'][] = $track[0];
-                    }
+                    $years[$year]['tracks'][] = $track[0];
                 } else {
                     $years[$year] = [
                         'name' => $year,
