@@ -269,6 +269,7 @@ class FrontController extends AbstractController
             $tracks = $this->get('doctrine')->getRepository(Track::class)->findHighlightsByYears();
 
             // Sort tracks by YEAR properly
+            $years = [];
             foreach ($tracks as $track) {
                 $year = $track['year_n'];
                 if (isset($years[$year])) {

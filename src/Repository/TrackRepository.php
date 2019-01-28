@@ -101,13 +101,11 @@ class TrackRepository extends EntityRepository
         return $query->getResult();
     }
 
-    public function updateHighlights(int $mode)
+    public function updateHighlights(int $mode, int $year)
     {
         $connection = $this->getEntityManager()
                             ->getConnection()
                             ->getWrappedConnection();
-
-        $thisYear = (new \DateTime())->format('Y');
 
         switch ($mode) {
             case self::MODE_YEARS:
@@ -124,7 +122,7 @@ class TrackRepository extends EntityRepository
                 break;
         }
 
-        $stmt->bindParam(':year', $thisYear, \PDO::PARAM_INT);
+        $stmt->bindParam(':year', $year, \PDO::PARAM_INT);
         $stmt->execute();
 
         return true;
