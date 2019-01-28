@@ -9,6 +9,9 @@ use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 class TrackRepository extends EntityRepository
 {
+    const MISSING_TUNEEFY = 0;
+    const MISSING_SPOTIFY = 1;
+
     private function getTrackResultSetMapping()
     {
         $rsm = new ResultSetMapping();
@@ -153,6 +156,28 @@ class TrackRepository extends EntityRepository
              ->andWhere('t.valid = 1')
              ->andWhere('t.spotifyLink IS NOT NULL')
              ->orderBy('t.startedAt', 'DESC')
+             ->getQuery()
+             ->getResult();
+    }
+
+    public function findMissingTracksFrom(int $what = self::MISSING_TUNEEFY, \Datetime $fromDate = null)
+    {
+        $query = $this->createQueryBuilder('t');
+
+        if (self::MISSING_TUNEEFY === $what) {
+            $query->where('t.tuneefyLink IS NULL')
+             ->andWhere('t.valid = 1');
+        } elseif (self::MISSING_SPOTIFY === $what) {
+            $query->where('t.spotifyLink IS NULL')
+             ->andWhere('t.valid = 1');
+        }
+
+        if ($fromDate) {
+            $query->andWhere('t.startedAt > :fromDate')
+             ->setParameter('fromDate', $fromDate);
+        }
+
+        return $query->orderBy('t.startedAt', 'DESC')
              ->getQuery()
              ->getResult();
     }
