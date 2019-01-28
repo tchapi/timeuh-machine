@@ -9,6 +9,10 @@ use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 class TrackRepository extends EntityRepository
 {
+    const MODE_YEARS = 0;
+    const MODE_MONTHS = 1;
+    const MODE_DAYS = 2;
+
     const MISSING_TUNEEFY = 0;
     const MISSING_SPOTIFY = 1;
 
@@ -96,6 +100,35 @@ class TrackRepository extends EntityRepository
         $query->setParameter(2, $month);
 
         return $query->getResult();
+    }
+
+    public function updateHighlights(int $mode)
+    {
+        $connection = $this->getEntityManager()
+                            ->getConnection()
+                            ->getWrappedConnection();
+
+        $thisYear = (new \DateTime())->format('Y');
+
+        switch ($mode) {
+            case self::MODE_YEARS:
+                $stmt = $connection->prepare('CALL refresh_years_mv_now(:year)');
+                break;
+            case self::MODE_MONTHS:
+                $stmt = $connection->prepare('CALL refresh_months_mv_now(:year)');
+                break;
+            case self::MODE_DAYS:
+                $stmt = $connection->prepare('CALL refresh_days_mv_now(:year)');
+                break;
+            default:
+                return false;
+                break;
+        }
+
+        $stmt->bindParam(':year', $thisYear, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return true;
     }
 
     public function findByMonth(int $year, int $month)
