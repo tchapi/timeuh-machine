@@ -62,7 +62,7 @@ class TrackFetcherCommand extends Command
         $trackRepository = $this->em->getRepository(Track::class);
 
         if ($input->getOption('from-date')) {
-            $fromDate = new \Datetime($input->getOption('from-date'));
+            $fromDate = new \DateTime($input->getOption('from-date'));
             $output->writeln('<comment>Fetching tracks after '.$fromDate->format('d/m/Y').'</comment>');
         }
 
