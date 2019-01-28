@@ -37,6 +37,7 @@ class ArchivesUpdaterCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $thisYear = (new \DateTime())->format('Y');
+        $thisMonth = (new \DateTime())->format('m');
 
         if ($input->getOption('from-all-time')) {
             foreach (range(self::STARTING_YEAR, $thisYear) as $year) {
@@ -47,8 +48,12 @@ class ArchivesUpdaterCommand extends Command
                 $output->writeln('<comment>  - Updating Months highlights.</comment>');
                 $this->trackRepository->updateHighlights(TrackRepository::MODE_MONTHS, $year);
 
-                $output->writeln('<comment>  - Updating Days highlights.</comment>');
-                $this->trackRepository->updateHighlights(TrackRepository::MODE_DAYS, $year);
+                $section = $output->section();
+                $section->writeln('<comment>  - Updating Days highlights : Month 1/12.</comment>');
+                foreach (range(1, 12) as $month) {
+                    $section->overwrite('<comment>  - Updating Days highlights : Month '.$month.'/12.</comment>');
+                    $this->trackRepository->updateHighlights(TrackRepository::MODE_DAYS, $year, $month);
+                }
             }
         } else {
             $output->writeln('<comment>Updating Years highlights for '.$thisYear.'.</comment>');
@@ -57,8 +62,8 @@ class ArchivesUpdaterCommand extends Command
             $output->writeln('<comment>Updating Months highlights for '.$thisYear.'.</comment>');
             $this->trackRepository->updateHighlights(TrackRepository::MODE_MONTHS, $thisYear);
 
-            $output->writeln('<comment>Updating Days highlights for '.$thisYear.'.</comment>');
-            $this->trackRepository->updateHighlights(TrackRepository::MODE_DAYS, $thisYear);
+            $output->writeln('<comment>Updating Days highlights for '.$thisYear.'/'.$thisMonth.'.</comment>');
+            $this->trackRepository->updateHighlights(TrackRepository::MODE_DAYS, $thisYear, $thisMonth);
         }
 
         $output->writeln('<info>Done, quitting.</info>');

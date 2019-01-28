@@ -101,7 +101,7 @@ class TrackRepository extends EntityRepository
         return $query->getResult();
     }
 
-    public function updateHighlights(int $mode, int $year)
+    public function updateHighlights(int $mode, string $year, ?string $month = null)
     {
         $connection = $this->getEntityManager()
                             ->getConnection()
@@ -115,7 +115,8 @@ class TrackRepository extends EntityRepository
                 $stmt = $connection->prepare('CALL refresh_months_mv_now(:year)');
                 break;
             case self::MODE_DAYS:
-                $stmt = $connection->prepare('CALL refresh_days_mv_now(:year)');
+                $stmt = $connection->prepare('CALL refresh_days_mv_now(:year, :month)');
+                $stmt->bindParam(':month', $month, \PDO::PARAM_INT);
                 break;
             default:
                 return false;
