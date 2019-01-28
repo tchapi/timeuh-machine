@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Track;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\ResultSetMapping;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 class TrackRepository extends EntityRepository
 {
