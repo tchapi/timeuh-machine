@@ -49,6 +49,14 @@ class FrontController extends AbstractController
     }
 
     /**
+     * @Route("/stats", name="stats")
+     */
+    public function statsAction(Request $request)
+    {
+        return $this->render('statistics.html.twig');
+    }
+
+    /**
      * @Route("/create/playlist/{year}/{month}/{day}", name="create_playlist", requirements={"year" = "\d+", "month" = "\d+", "day" = "\d+"})
      */
     public function intiateCreatePlaylist(Request $request, int $year = null, int $month = null, ?int $day = null)

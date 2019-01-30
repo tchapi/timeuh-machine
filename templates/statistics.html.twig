@@ -1,0 +1,104 @@
+{% extends "base.html.twig" %}
+{% set menu = 'stats' %}
+
+{% block content %}
+
+<div class="ui container">
+  <h2>{{ "stats.title"|trans }}</h2>
+
+  <h3>L'année 2018 en chiffres</h3>
+
+  <p>Et comme ils passent quotidiennement du son de <strong>très bonne qualité</strong>, j'ai voulu sauvegarder leurs choix musicaux et permettre à tout le monde de retrouver les titres passés sur la radio, en dehors des dix derniers titres déjà disponibles (<a href="http://player.radiomeuh.com/playlist/">ici</a>).</p>
+
+  <h2>12 354 chansons passées sur la radio <em>(à peu près)</em> soit 3245 artistes</h2>
+
+SELECT COUNT(id) AS total_songs FROM track WHERE YEAR(started_at) = 2018;
+SELECT COUNT(DISTINCT artist) AS total_artists FROM track WHERE YEAR(started_at) = 2018;
+
+  <p>Soit une moyenne de 346 chansons par jour</p>
+
+  <canvas id="bar-chart" width="800" height="250"></canvas>
+## Number of songs per day (graph) :
+SELECT DATE(started_at) AS d, COUNT(id) AS nb FROM track WHERE YEAR(started_at) = 2018 GROUP BY d ORDER BY d ASC;
+Pretty consistent (or not)
+  
+
+  <h4>La chanson la plus souvent passée :</h4>
+
+  <div class="ui items">
+    <div class="item">
+      <div class="image">
+        <img src="/images/wireframe/image.png">
+      </div>
+      <div class="content">
+        <a class="header">Header</a>
+        <div class="meta">
+          <span>Description</span>
+        </div>
+        <div class="description">
+          <p></p>
+        </div>
+        <div class="extra">
+          Additional Details
+        </div>
+      </div>
+    </div>
+  </div>
+
+## Most played song :
+SELECT title, artist, album, COUNT(id) AS times FROM track WHERE YEAR(started_at) = 2018 GROUP BY title ORDER BY times DESC LIMIT 5;
+And top 5 :
+
+  <h4>L'artiste le plus utilisé :</h4>
+
+## Most played artist :
+SELECT artist, COUNT(id) AS times FROM track WHERE YEAR(started_at) = 2018 GROUP BY artist ORDER BY times DESC LIMIT 5;
+And top 5
+
+  <div class="ui items">
+    <div class="item">
+      <div class="image">
+        <img src="/images/wireframe/image.png">
+      </div>
+      <div class="content">
+        <a class="header">Header</a>
+        <div class="meta">
+          <span>Description</span>
+        </div>
+        <div class="description">
+          <p></p>
+        </div>
+        <div class="extra">
+          Additional Details
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+  <script>
+    // Bar chart
+    new Chart(document.getElementById("bar-chart"), {
+        type: 'bar',
+        data: {
+          labels: ["Africa", "Asia", "Europe", "Latin America", "North America"],
+          datasets: [
+            {
+              label: "Population (millions)",
+              backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+              data: [2478,5267,734,784,433]
+            }
+          ]
+        },
+        options: {
+          legend: { display: false },
+          title: { display: false }
+        }
+    });
+  </script>
+{% endblock %}
