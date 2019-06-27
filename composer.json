@@ -7,7 +7,7 @@
         "php": "^7.1.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "beberlei/DoctrineExtensions": "^1.0",
+        "beberlei/doctrineextensions": "^1.0",
         "jwilsson/spotify-web-api-php": "^2.0",
         "sensio/framework-extra-bundle": "^5.2",
         "symfony/asset": "^4.1",
