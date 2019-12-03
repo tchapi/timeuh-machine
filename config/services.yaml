@@ -49,5 +49,5 @@ services:
             - [setParameterBag, ["@=service('kernel').getContainer().getParameterBag()"]]
     
     App\Repository\TrackRepository:
-        factory: 'doctrine.orm.entity_manager:getRepository'
+        factory: ['@doctrine.orm.entity_manager', 'getRepository']
         arguments: ['App\Entity\Track']
