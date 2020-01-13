@@ -34,8 +34,6 @@ final class ApiService
 
     /**
      * Set ParameterBag.
-     *
-     * @param ParameterBagInterface $params
      */
     public function setParameterBag(ParameterBagInterface $params): void
     {
@@ -44,8 +42,6 @@ final class ApiService
 
     /**
      * Get parameter from ParameterBag.
-     *
-     * @param string $name
      *
      * @return mixed
      */
@@ -56,8 +52,6 @@ final class ApiService
 
     /**
      * Runs different tests to see if this Track is really a song.
-     *
-     * @param Track $track
      */
     private function checkValid(Track $track): void
     {
@@ -69,7 +63,8 @@ final class ApiService
         // ex : PetiteRadiomeuh (Jingle), Jingle, ...
         if (false !== strpos($title, 'jingle') ||
             false !== strpos($artist, 'jingle') ||
-            false !== strpos($title, 'radiomeuh')) {
+            false !== strpos($title, 'radiomeuh') ||
+            false !== strpos($artist, 'radiomeuh')) {
             $track->setValid(false);
 
             return;
@@ -137,8 +132,6 @@ final class ApiService
     /**
      * Retrieves the two current and last tracks from the API
      * and stores them.
-     *
-     * @return int
      */
     public function getCurrentAndLastTrack(): int
     {
