@@ -53,6 +53,11 @@ class Track
     private $spotifyLink;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $deezerLink;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $valid;
@@ -280,5 +285,29 @@ class Track
     public function getSpotifyLink()
     {
         return $this->spotifyLink;
+    }
+
+    /**
+     * Set deezerLink.
+     *
+     * @param string $deezerLink
+     *
+     * @return Track
+     */
+    public function setDeezerLink($deezerLink)
+    {
+        $this->deezerLink = $deezerLink;
+
+        return $this;
+    }
+
+    /**
+     * Get deezerLink.
+     *
+     * @return string
+     */
+    public function getDeezerLink()
+    {
+        return $this->deezerLink;
     }
 }

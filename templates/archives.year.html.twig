@@ -11,7 +11,20 @@
 
     <p>{% for track in month.tracks if track.artist %}{{ track.artist|capitalize }}, {% endfor %}{{ "archives.and.many.more"|trans }}</p>
 
-    <p><a href="{{ path('archives', {year: year, month: month.key}) }}" class="ui button teal"><i class="ui icon music"></i> {{ "archives.see.all.this.month"|trans}}</a> <a href="{{ path('create_playlist', {year: year, month: month.key}) }}?referer={{ path('archives', {year: year}) }}#{{ month.name }}" class="ui button spotify"><i class="ui icon spotify"></i> {{ "playlist.create.month"|trans}}</a></p>
+    <p>
+      <a href="{{ path('archives', {year: year, month: month.key}) }}" class="ui button teal"><i class="ui icon music"></i> {{ "archives.see.all.this.month"|trans}}</a>
+      <span class="ui left labeled button">
+        <span class="ui basic right pointing label">
+          {{ "playlist.create.month"|trans}} 
+        </span>
+        <a href="{{ path('create_playlist', {provider: 'spotify', year: year, month: month.key}) }}?referer={{ path('archives', {year: year}) }}#{{ month.name }}" class="ui button spotify" style="border-radius: 0px">
+          <i class="ui icon spotify"></i> Spotify
+        </a>
+        <a href="{{ path('create_playlist', {provider: 'deezer', year: year, month: month.key}) }}?referer={{ path('archives', {year: year}) }}#{{ month.name }}" class="ui button black">
+          <i class="ui icon music"></i> Deezer
+        </a>
+      </span>
+    </p>
     <div class="ui eight cards doubling">
       {% for track in month.tracks %}
       <div class="card">

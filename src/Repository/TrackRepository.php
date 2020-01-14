@@ -14,6 +14,7 @@ class TrackRepository extends EntityRepository
 
     const MISSING_TUNEEFY = 0;
     const MISSING_SPOTIFY = 1;
+    const MISSING_DEEZER = 2;
 
     private function getTrackResultSetMapping()
     {
@@ -159,25 +160,29 @@ class TrackRepository extends EntityRepository
              ->getResult();
     }
 
-    public function findSpotifyLinksForMonth($year, $month)
+    public function findProviderLinksForMonth($provider, $year, $month)
     {
+        $columnName = strtolower($provider).'Link';
+
         return $this->createQueryBuilder('t')
-             ->select('t.spotifyLink')
+             ->select('t.'.$columnName)
              ->where('YEAR(t.startedAt) = :year')
              ->setParameter('year', $year)
              ->andWhere('MONTH(t.startedAt) = :month')
              ->setParameter('month', $month)
              ->andWhere('t.valid = 1')
-             ->andWhere('t.spotifyLink IS NOT NULL')
+             ->andWhere('t.'.$columnName.' IS NOT NULL')
              ->orderBy('t.startedAt', 'DESC')
              ->getQuery()
              ->getResult();
     }
 
-    public function findSpotifyLinksForDay($year, $month, $day)
+    public function findProviderLinksForDay($provider, $year, $month, $day)
     {
+        $columnName = strtolower($provider).'Link';
+
         return $this->createQueryBuilder('t')
-             ->select('t.spotifyLink')
+             ->select('t.'.$columnName)
              ->where('YEAR(t.startedAt) = :year')
              ->setParameter('year', $year)
              ->andWhere('MONTH(t.startedAt) = :month')
@@ -185,7 +190,7 @@ class TrackRepository extends EntityRepository
              ->andWhere('DAY(t.startedAt) = :day')
              ->setParameter('day', $day)
              ->andWhere('t.valid = 1')
-             ->andWhere('t.spotifyLink IS NOT NULL')
+             ->andWhere('t.'.$columnName.' IS NOT NULL')
              ->orderBy('t.startedAt', 'DESC')
              ->getQuery()
              ->getResult();
@@ -200,6 +205,9 @@ class TrackRepository extends EntityRepository
              ->andWhere('t.valid = 1');
         } elseif (self::MISSING_SPOTIFY === $what) {
             $query->where('t.spotifyLink IS NULL')
+             ->andWhere('t.valid = 1');
+        } elseif (self::MISSING_DEEZER === $what) {
+            $query->where('t.deezerLink IS NULL')
              ->andWhere('t.valid = 1');
         }
 
