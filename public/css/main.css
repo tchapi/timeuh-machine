@@ -50,6 +50,9 @@ body {
   color: white;
   margin-top: 10px;
 }
+.ui.button.spotify:hover {
+  background: #30c85e;
+}
 
 .ui.container.message {
   margin-bottom: 20px;
