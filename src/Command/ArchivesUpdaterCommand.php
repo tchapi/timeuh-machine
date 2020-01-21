@@ -67,6 +67,8 @@ class ArchivesUpdaterCommand extends Command
         }
 
         $output->writeln('<info>Done, quitting.</info>');
+
+        return 1;
     }
 
     protected function runCommand($command, InputInterface $input, OutputInterface $output)

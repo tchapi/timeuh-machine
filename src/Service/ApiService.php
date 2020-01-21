@@ -307,4 +307,29 @@ final class ApiService
 
         return str_replace('https://open.spotify.com/track/', 'spotify:track:', $data->links->spotify[0]);
     }
+
+    public function getDeezerLinkForTuneefyLink(string $tuneefyLink): ?string
+    {
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_URL => $tuneefyLink.'?format=json',
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$response) {
+            return null;
+        }
+
+        $data = json_decode($response, false);
+
+        if (!isset($data->links->deezer)) {
+            return null;
+        }
+
+        return str_replace('"https://www.deezer.com/track/', '', $data->links->deezer[0]);
+    }
 }

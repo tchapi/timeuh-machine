@@ -50,6 +50,12 @@ class TrackFetcherCommand extends Command
                 'Does not fetch the last tracks but rather fix missing Spotify information in the whole database'
             )
             ->addOption(
+                'fix-deezer',
+                null,
+                InputOption::VALUE_NONE,
+                'Does not fetch the last tracks but rather fix missing Deezer information in the whole database'
+            )
+            ->addOption(
                 'from-date',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -114,6 +120,30 @@ class TrackFetcherCommand extends Command
             }
 
             $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
+        } elseif ($input->getOption('fix-deezer')) {
+            $output->writeln('<info>Fixing missing Deezer data in database</info>');
+            $tracks = $trackRepository->findMissingTracksFrom(TrackRepository::MISSING_DEEZER, $fromDate ?? null);
+            $counter = 0;
+
+            foreach ($tracks as $track) {
+                $output->write('<comment>Fetching missing Deezer data for track #'.$track->getId().' "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+
+                if (null != $track->getTuneefyLink()) {
+                    $result = $this->apiService->getDeezerLinkForTuneefyLink($track->getTuneefyLink());
+                    if ($result) {
+                        $track->setDeezerLink($result);
+                        $this->em->flush();
+                        $output->writeln('<info>Done.</info>');
+                        ++$counter;
+                    } else {
+                        $output->writeln('<error>No result.</error>');
+                    }
+                } else {
+                    $output->writeln('<comment>No tuneefy link, skipping.</comment>');
+                }
+            }
+
+            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
         } else {
             $output->writeln('<info>Fetching data from API</info>');
             $code = $this->apiService->getCurrentAndLastTrack();
@@ -126,6 +156,8 @@ class TrackFetcherCommand extends Command
         }
 
         $output->writeln('<info>Done, quitting.</info>');
+
+        return 1;
     }
 
     protected function runCommand($command, InputInterface $input, OutputInterface $output)
