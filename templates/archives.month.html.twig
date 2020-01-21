@@ -9,7 +9,7 @@
   {% for day in days %}
     <h2 id="{{ monthName }}{{ day.name }}">{{ day.name }} {{ monthName|capitalize }} {{ year }}</h2>
 
-    <p>{% for track in day.tracks if track.artist %}{{ track.artist|capitalize }}, {% endfor %}{{ "archives.and.many.more"|trans }}</p>
+    <p>{% for track in day.tracks|filter(track => track.artist) %}{{ track.artist|capitalize }}, {% endfor %}{{ "archives.and.many.more"|trans }}</p>
 
     <p>
       <a href="{{ path('archives', {year: year, month: month, day: day.key}) }}" class="ui button teal"><i class="ui icon music"></i> {{ "archives.see.all.this.day"|trans}}</a>
