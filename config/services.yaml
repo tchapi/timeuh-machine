@@ -9,9 +9,9 @@ imports:
 parameters:
     ga_tracker_id: "%env(GA_TRACKER_ID)%"
     tracks_per_page: 20
-    track_endpoint: 'http://player.radiomeuh.com/rtdata/tracks.xml'
-    website_link: 'http://radiomeuh.com'
-    player_link: 'http://player.radiomeuh.com'
+    track_endpoint: 'http://ilaster.radiomeuh.com/mediabox/api/v0/gettrack_json.php'
+    website_link: 'https://www.radiomeuh.com'
+    player_link: 'https://www.radiomeuh.com'
     bot_link: 'http://t.me/RadioMeuhBot'
     tuneefy_track_endpoint: 'https://data.tuneefy.com/v2/aggregate/track?limit=1&aggressive&q=%s'
     tuneefy_share_endpoint: 'https://data.tuneefy.com/v2/share/%s'

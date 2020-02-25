@@ -141,8 +141,8 @@ final class ApiService
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_HTTPHEADER => [],
             CURLOPT_FOLLOWLOCATION => 1,
-            CURLOPT_TIMEOUT_MS => 2000,
-            CURLOPT_CONNECTTIMEOUT_MS => 2000,
+            CURLOPT_TIMEOUT_MS => 10000,
+            CURLOPT_CONNECTTIMEOUT_MS => 10000,
             CURLOPT_URL => $this->getParameter('track_endpoint'),
         ]);
 
@@ -155,14 +155,17 @@ final class ApiService
 
         // Structure content
         try {
-            $tracks = new \SimpleXMLElement($response, LIBXML_NOERROR);
+            $data = json_decode($response);
         } catch (Exception $e) {
             return self::RETURN_BAD_RESPONSE;
         }
 
+        $tracks = $data->result;
+        unset($tracks->log);
+
         $tracksRepository = $this->em->getRepository(Track::class);
 
-        foreach ($tracks->track as $track) {
+        foreach ($tracks as $track) {
             // The starting time of the song is a unique identifier so we can rely
             // on that to see if we've hit the same playlist or not in this call.
             // BUT we have to be cautious since only the HH:mm:ss is indicated in
