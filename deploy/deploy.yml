@@ -1,0 +1,80 @@
+---
+- hosts: "{{ timeuh_hosts }}"
+  vars_files:
+    - ./vars.yml
+  tasks:
+    - name: Set some variables
+      set_fact:
+        release_path: "{{ project_path }}/releases/{{ lookup('pipe','date +%Y%m%d%H%M%S') }}"
+        current_path: "{{ project_path }}/current"
+        shared_path: "{{ project_path }}/shared"
+    - name: Retrieve current release folder
+      command: readlink -f current
+      register: current_release_path
+      ignore_errors: yes
+      args:
+        chdir: "{{ project_path }}"
+    - name: Ensure shared folder is present
+      file:
+        path: "{{ shared_path }}"
+        state: directory
+    - name: Create new folder
+      file:
+        dest={{ release_path }}
+        mode=0755
+        recurse=yes
+        state=directory
+    - name: Clone the repository
+      git:
+        repo: "git@github.com:tchapi/timeuh-machine.git"
+        dest: "{{ release_path }}"
+    - name: Link .env.local file
+      file:
+        src={{ shared_path }}/.env.local
+        dest={{ release_path }}/.env.local
+        state=link
+    - name: Install composer dependencies
+      composer:
+        command: install
+        working_dir: "{{ release_path }}"
+        prefer_dist: yes
+    - name: Remove perilous files
+      file:
+        path: "{{ release_path }}/{{ item }}"
+        state: absent
+      with_items:
+        - .gitignore
+        - .git
+        - .php_cs
+        - deploy
+        - LICENSE
+        - README.md
+    - name: Creates a cron file under /etc/cron.d for fetching tracks
+      become: yes
+      become_user: root
+      cron:
+        name: "Timeuh-machine: Fetch tracks"
+        minute: "8"
+        user: "{{ansible_user}}"
+        job: "{{current_path}}/bin/console timeuh-machine:fetch-tracks >> /dev/null 2>&1"
+        cron_file: timeuh-machine_fetch-tracks
+    - name: Creates a cron file under /etc/cron.d for updating archives
+      become: yes
+      become_user: root
+      cron:
+        name: "Timeuh-machine: Update archives"
+        minute: "42"
+        hour: "4"
+        user: "{{ansible_user}}"
+        job: "{{current_path}}/bin/console timeuh-machine:update-archives >> /dev/null 2>&1"
+        cron_file: timeuh-machine_update-archives
+    - name: Update symlink
+      file:
+        src={{ release_path }}
+        dest={{ current_path }}
+        state=link
+    - name: Delete old dir
+      shell: rm -rf {{ current_release_path.stdout }}/
+      when: current_release_path.stdout != current_path
+      args:
+        warn: false
