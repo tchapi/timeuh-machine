@@ -2,9 +2,9 @@
 /build/
 
 ###> symfony/framework-bundle ###
-/.env.local
-/.env.local.php
-/.env.*.local
+.env.local
+.env.local.php
+.env.*.local
 /public/bundles/
 /var/
 /vendor/
@@ -26,8 +26,7 @@
 
 .idea/*
 
-deploy/*
-!deploy/nginx.conf
+deploy/vars.yml
 
 logo.psd
 TODO.todo
