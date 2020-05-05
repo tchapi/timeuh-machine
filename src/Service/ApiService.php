@@ -254,6 +254,13 @@ final class ApiService
             $spotifyLink = null;
         }
 
+        if (isset($data->results[0]->musical_entity->links->deezer)) {
+            $deezerLink = $data->results[0]->musical_entity->links->deezer[0];
+            $deezerLink = str_replace('https://www.deezer.com/track/', '', $deezerLink);
+        } else {
+            $deezerLink = null;
+        }
+
         // Get the link
         $ch = curl_init();
 
@@ -282,6 +289,7 @@ final class ApiService
         return [
             'link' => $data->link,
             'spotifyLink' => $spotifyLink,
+            'deezerLink' => $deezerLink,
             'image' => $image,
         ];
     }
@@ -333,6 +341,6 @@ final class ApiService
             return null;
         }
 
-        return str_replace('"https://www.deezer.com/track/', '', $data->links->deezer[0]);
+        return str_replace('https://www.deezer.com/track/', '', $data->links->deezer[0]);
     }
 }
