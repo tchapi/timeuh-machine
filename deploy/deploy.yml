@@ -54,9 +54,9 @@
       become_user: root
       cron:
         name: "Timeuh-machine: Fetch tracks"
-        minute: "8"
+        minute: "7"
         user: "{{ansible_user}}"
-        job: "{{current_path}}/bin/console timeuh-machine:fetch-tracks >> /dev/null 2>&1"
+        job: "{{current_path}}/bin/console timeuh-machine:fetch-tracks >> {{current_path}}/var/log/fetch-tracks_cron.log"
         cron_file: timeuh-machine_fetch-tracks
     - name: Creates a cron file under /etc/cron.d for updating archives
       become: yes
@@ -66,7 +66,7 @@
         minute: "42"
         hour: "4"
         user: "{{ansible_user}}"
-        job: "{{current_path}}/bin/console timeuh-machine:update-archives >> /dev/null 2>&1"
+        job: "{{current_path}}/bin/console timeuh-machine:update-archives >> {{current_path}}/var/log/update-archives_cron.log"
         cron_file: timeuh-machine_update-archives
     - name: Update symlink
       file:
