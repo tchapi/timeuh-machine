@@ -200,6 +200,7 @@ final class ApiService
                 if ($result) {
                     $t->setTuneefyLink($result['link']);
                     $t->setSpotifyLink($result['spotifyLink']);
+                    $t->setDeezerLink($result['deezerLink']);
                     if ($result['image']) {
                         $t->setImage($result['image']);
                     }
