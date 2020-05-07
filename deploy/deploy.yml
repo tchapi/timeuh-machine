@@ -54,7 +54,7 @@
       become_user: root
       cron:
         name: "Timeuh-machine: Fetch tracks"
-        minute: "7"
+        minute: "*/5"
         user: "{{ansible_user}}"
         job: "{{current_path}}/bin/console timeuh-machine:fetch-tracks >> {{current_path}}/var/log/fetch-tracks_cron.log"
         cron_file: timeuh-machine_fetch-tracks
