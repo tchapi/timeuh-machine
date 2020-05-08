@@ -182,18 +182,18 @@ class TrackRepository extends EntityRepository
         $columnName = strtolower($provider).'Link';
 
         return $this->createQueryBuilder('t')
-             ->select('t.'.$columnName)
-             ->where('YEAR(t.startedAt) = :year')
-             ->setParameter('year', $year)
-             ->andWhere('MONTH(t.startedAt) = :month')
-             ->setParameter('month', $month)
-             ->andWhere('DAY(t.startedAt) = :day')
-             ->setParameter('day', $day)
-             ->andWhere('t.valid = 1')
-             ->andWhere('t.'.$columnName.' IS NOT NULL')
-             ->orderBy('t.startedAt', 'DESC')
-             ->getQuery()
-             ->getResult();
+            ->select('t.'.$columnName)
+            ->where('YEAR(t.startedAt) = :year')
+            ->setParameter('year', $year)
+            ->andWhere('MONTH(t.startedAt) = :month')
+            ->setParameter('month', $month)
+            ->andWhere('DAY(t.startedAt) = :day')
+            ->setParameter('day', $day)
+            ->andWhere('t.valid = 1')
+            ->andWhere('t.'.$columnName.' IS NOT NULL')
+            ->orderBy('t.startedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function findMissingTracksFrom(int $what = self::MISSING_TUNEEFY, \Datetime $fromDate = null)
