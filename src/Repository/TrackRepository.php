@@ -202,22 +202,24 @@ class TrackRepository extends EntityRepository
 
         if (self::MISSING_TUNEEFY === $what) {
             $query->where('t.tuneefyLink IS NULL')
-             ->andWhere('t.valid = 1');
+                ->andWhere('t.valid = 1');
         } elseif (self::MISSING_SPOTIFY === $what) {
-            $query->where('t.spotifyLink IS NULL')
-             ->andWhere('t.valid = 1');
+            $query->where('t.tuneefyLink IS NOT NULL')
+                ->andWhere('t.spotifyLink IS NULL')
+                ->andWhere('t.valid = 1');
         } elseif (self::MISSING_DEEZER === $what) {
-            $query->where('t.deezerLink IS NULL')
-             ->andWhere('t.valid = 1');
+            $query->where('t.tuneefyLink IS NOT NULL')
+                ->andWhere('t.deezerLink IS NULL')
+                ->andWhere('t.valid = 1');
         }
 
         if ($fromDate) {
             $query->andWhere('t.startedAt > :fromDate')
-             ->setParameter('fromDate', $fromDate);
+                ->setParameter('fromDate', $fromDate);
         }
 
         return $query->orderBy('t.startedAt', 'DESC')
-             ->getQuery()
-             ->getResult();
+            ->getQuery()
+            ->getResult();
     }
 }
