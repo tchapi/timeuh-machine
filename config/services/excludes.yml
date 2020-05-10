@@ -11,3 +11,5 @@ parameters:
           - "/.*What\\s+The\\s+Funk\\s+Radio\\s+Show\\s[0-9]+.*/"
           - "/.*We\\s+Love\\s+S[0-9]+(\\s|\\.)Ep[0-9]+.*/"
           - "/.*It\\s+Is\\s+What\\s+It\\s+Is.*/"
+          - "/.*Boom\\s+Baom\\s+Room.*/"
+          - "/.*S[0-9]+(\\s|\\.)Ep[0-9]+.*/"
