@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="track")
  */
-final class Track
+class Track
 {
     /**
      * @ORM\Id
