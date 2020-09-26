@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 final class DeezerApi
 {
-    const AUTH_URL = 'https://connect.deezer.com/oauth/auth.php';
+    private const AUTH_URL = 'https://connect.deezer.com/oauth/auth.php';
 
-    const TOKEN_ENDPOINT = 'https://connect.deezer.com/oauth/access_token.php';
-    const PLAYLISTS_ENDPOINT = 'https://api.deezer.com/user/me/playlists';
-    const PLAYLISTS_TRACKS_ENDPOINT = 'https://api.deezer.com/playlist/%s/tracks';
+    private const TOKEN_ENDPOINT = 'https://connect.deezer.com/oauth/access_token.php';
+    private const PLAYLISTS_ENDPOINT = 'https://api.deezer.com/user/me/playlists';
+    private const PLAYLISTS_TRACKS_ENDPOINT = 'https://api.deezer.com/playlist/%s/tracks';
 
     /**
      * @var string
@@ -56,15 +58,6 @@ final class DeezerApi
         return self::AUTH_URL.'?'.http_build_query($params);
     }
 
-    private function createApiUri(string $endpoint)
-    {
-        $auth = [
-            'access_token' => $this->access_token,
-        ];
-
-        return $endpoint.'?'.http_build_query($auth);
-    }
-
     public function requestAccessToken(string $code): void
     {
         $boilerplate = [
@@ -77,24 +70,24 @@ final class DeezerApi
             'output' => 'json',
         ]);
 
-        $ch = curl_init();
+        $curlHandler = curl_init();
 
-        curl_setopt_array($ch, [
+        curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_URL => self::TOKEN_ENDPOINT.'?'.http_build_query($params),
         ]);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $response = curl_exec($curlHandler);
+        curl_close($curlHandler);
 
         if (!$response || 'wrong code' === $response) {
-            throw new \Exception('Bad response from Deezer API');
+            throw new \Exception('Deezer API: Bad response');
         }
 
         $token_info = json_decode($response);
 
         if (is_null($token_info)) {
-            throw new \Exception('Could not parse response from Deezer API');
+            throw new \Exception('Deezer API: Could not parse response');
         }
 
         $this->access_token = $token_info->access_token;
@@ -104,105 +97,108 @@ final class DeezerApi
     public function getUserPlaylists()
     {
         if (!$this->access_token || $this->expire < new \DateTime()) {
-            throw new \Exception('Missing access token or token expired');
+            throw new \Exception('Deezer API: Missing access token or token expired');
         }
 
-        $ch = curl_init();
+        $curlHandler = curl_init();
 
-        curl_setopt_array($ch, [
+        curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_URL => $this->createApiUri(self::PLAYLISTS_ENDPOINT),
         ]);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $response = curl_exec($curlHandler);
+        curl_close($curlHandler);
 
         if (!$response) {
-            throw new \Exception('Could not get user playlists from Deezer API');
+            throw new \Exception('Deezer API: Could not get user playlists');
         }
 
-        $playlists = json_decode($response);
-
-        return $playlists;
+        return json_decode($response);
     }
 
     public function createPlaylist(array $params)
     {
         if (!$this->access_token || $this->expire < new \DateTime()) {
-            throw new \Exception('Missing access token or token expired');
+            throw new \Exception('Deezer API: Missing access token or token expired');
         }
 
-        $ch = curl_init();
+        $curlHandler = curl_init();
 
-        curl_setopt_array($ch, [
+        curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_POST => 1,
             CURLOPT_URL => $this->createApiUri(self::PLAYLISTS_ENDPOINT),
             CURLOPT_POSTFIELDS => http_build_query(['title' => $params['title']]),
         ]);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $response = curl_exec($curlHandler);
+        curl_close($curlHandler);
 
         if (!$response) {
-            throw new \Exception('Could not create playlist from Deezer API');
+            throw new \Exception('Deezer API: Could not create playlist');
         }
 
-        $data = json_decode($response);
-
-        return $data;
+        return json_decode($response);
     }
 
     public function getPlaylistTracks(string $playlistId)
     {
         if (!$this->access_token || $this->expire < new \DateTime()) {
-            throw new \Exception('Missing access token or token expired');
+            throw new \Exception('Deezer API: Missing access token or token expired');
         }
 
         $endpoint = str_replace('%s', $playlistId, self::PLAYLISTS_TRACKS_ENDPOINT);
 
-        $ch = curl_init();
+        $curlHandler = curl_init();
 
-        curl_setopt_array($ch, [
+        curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_URL => $this->createApiUri($endpoint),
         ]);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $response = curl_exec($curlHandler);
+        curl_close($curlHandler);
 
         if (!$response) {
-            throw new \Exception('Could not get playlist tracks from Deezer API');
+            throw new \Exception('Deezer API: Could not get tracks');
         }
 
-        $tracks = json_decode($response);
-
-        return $tracks;
+        return json_decode($response);
     }
 
-    public function addPlaylistTracks(string $playlistId, array $tracks)
+    public function addPlaylistTracks(string $playlistId, array $tracks): void
     {
         if (!$this->access_token || $this->expire < new \DateTime()) {
-            throw new \Exception('Missing access token or token expired');
+            throw new \Exception('Deezer API: Missing access token or token expired');
         }
 
         $tracks_param = implode(',', $tracks);
         $endpoint = str_replace('%s', $playlistId, self::PLAYLISTS_TRACKS_ENDPOINT);
 
-        $ch = curl_init();
+        $curlHandler = curl_init();
 
-        curl_setopt_array($ch, [
+        curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_POST => 1,
             CURLOPT_URL => $this->createApiUri($endpoint),
             CURLOPT_POSTFIELDS => http_build_query(['songs' => $tracks_param]),
         ]);
 
-        $response = curl_exec($ch);
-        curl_close($ch);
+        $response = curl_exec($curlHandler);
+        curl_close($curlHandler);
 
         if (!$response) {
-            throw new \Exception('Could not add tracks to playlist from Deezer API');
+            throw new \Exception('Deezer API: Could not add tracks to playlist');
         }
+    }
+
+    private function createApiUri(string $endpoint)
+    {
+        $auth = [
+            'access_token' => $this->access_token,
+        ];
+
+        return $endpoint.'?'.http_build_query($auth);
     }
 }

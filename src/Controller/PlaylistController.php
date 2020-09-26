@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Track;
@@ -7,7 +9,6 @@ use App\Service\DeezerApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -17,7 +18,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @author Cyril Chapellier
  */
-class PlaylistController extends AbstractController
+final class PlaylistController extends AbstractController
 {
     const PROVIDER_DEEZER = 'deezer';
     const PROVIDER_SPOTIFY = 'spotify';
@@ -43,7 +44,7 @@ class PlaylistController extends AbstractController
         }
 
         // If there is no track
-        if (0 == count($tracks)) {
+        if (0 === count($tracks)) {
             $this->addFlash(
                 'success',
                 $translator->trans('playlist.message.message_no_tracks')
@@ -53,7 +54,7 @@ class PlaylistController extends AbstractController
         }
 
         // flatten array
-        array_walk($tracks, function (&$item, $key) use ($provider) {
+        array_walk($tracks, static function (&$item) use ($provider): void {
             $item = $item[strtolower($provider).'Link'];
         });
 
@@ -102,7 +103,7 @@ class PlaylistController extends AbstractController
     /**
      * @Route("/finalize/playlist/{provider}", name="finalize_playlist", requirements={"provider" = "spotify|deezer"})
      */
-    public function finalizeCreatePlaylist(EntityManagerInterface $em, TranslatorInterface $translator, Request $request, string $provider)
+    public function finalizeCreatePlaylist(TranslatorInterface $translator, Request $request, string $provider)
     {
         // Retrieves the stored session info
         $session = $request->getSession();
@@ -157,8 +158,8 @@ class PlaylistController extends AbstractController
             $playlists = $api->getUserPlaylists();
         }
 
-        $providerPlaylistId = array_reduce($playlists->items, function ($carry, $existingPlaylist) use ($playlist) {
-            return ($existingPlaylist->name === $playlist['name']) ? $existingPlaylist->id : $carry;
+        $providerPlaylistId = array_reduce($playlists->items, static function ($carry, $existingPlaylist) use ($playlist) {
+            return $existingPlaylist->name === $playlist['name'] ? $existingPlaylist->id : $carry;
         }, null);
 
         if (null !== $providerPlaylistId) {

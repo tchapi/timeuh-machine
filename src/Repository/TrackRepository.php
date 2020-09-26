@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Track;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\ResultSetMapping;
 
-class TrackRepository extends EntityRepository
+final class TrackRepository extends EntityRepository
 {
     const MODE_YEARS = 0;
     const MODE_MONTHS = 1;
@@ -16,48 +18,35 @@ class TrackRepository extends EntityRepository
     const MISSING_SPOTIFY = 1;
     const MISSING_DEEZER = 2;
 
-    private function getTrackResultSetMapping()
-    {
-        $rsm = new ResultSetMapping();
-        $rsm->addEntityResult(\App\Entity\Track::class, 't');
-        $rsm->addFieldResult('t', 'id', 'id');
-        $rsm->addFieldResult('t', 'title', 'title');
-        $rsm->addFieldResult('t', 'album', 'album');
-        $rsm->addFieldResult('t', 'artist', 'artist');
-        $rsm->addFieldResult('t', 'image', 'image');
-
-        return $rsm;
-    }
-
     public function findCurrentlyPlayingTrack()
     {
         $limit = new \Datetime('now - 30 minutes');
 
         return $this->createQueryBuilder('t')
-               ->where('t.startedAt > :limit')
-               ->setParameter('limit', $limit)
-               ->andWhere('t.valid = 1')
-               ->orderBy('t.startedAt', 'DESC')
-               ->getQuery()
-               ->setMaxResults(1)
-               ->getOneOrNullResult();
+            ->where('t.startedAt > :limit')
+            ->setParameter('limit', $limit)
+            ->andWhere('t.valid = 1')
+            ->orderBy('t.startedAt', 'DESC')
+            ->getQuery()
+            ->setMaxResults(1)
+            ->getOneOrNullResult();
     }
 
     public function findNLastTracksExceptCurrentOnPage(int $max, ?Track $current, int $page)
     {
         $q = $this->createQueryBuilder('t')
-                  ->where('t.valid = 1');
+            ->where('t.valid = 1');
 
         if ($current) {
             $q->andWhere('t.id != :currentId')
-            ->setParameter('currentId', $current->getId());
+                ->setParameter('currentId', $current->getId());
         }
 
         return $q->setFirstResult(($page - 1) * $max)
-                 ->setMaxResults($max)
-                 ->orderBy('t.startedAt', 'DESC')
-                 ->getQuery()
-                 ->getResult();
+            ->setMaxResults($max)
+            ->orderBy('t.startedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function findHighlightsByYears()
@@ -105,8 +94,8 @@ class TrackRepository extends EntityRepository
     public function updateHighlights(int $mode, string $year, ?string $month = null)
     {
         $connection = $this->getEntityManager()
-                            ->getConnection()
-                            ->getWrappedConnection();
+            ->getConnection()
+            ->getWrappedConnection();
 
         switch ($mode) {
             case self::MODE_YEARS:
@@ -133,31 +122,31 @@ class TrackRepository extends EntityRepository
     public function findByMonth(int $year, int $month)
     {
         return $this->createQueryBuilder('t')
-             ->select('t.startedAt, t.image, t.title, t.album, t.artist, DAY(t.startedAt) as day_n')
-             ->where('YEAR(t.startedAt) = :year')
-             ->setParameter('year', $year)
-             ->andWhere('MONTH(t.startedAt) = :month')
-             ->setParameter('month', $month)
-             ->andWhere('t.valid = 1')
-             ->andWhere("t.image != ''")
-             ->getQuery()
-             ->getResult();
+            ->select('t.startedAt, t.image, t.title, t.album, t.artist, DAY(t.startedAt) as day_n')
+            ->where('YEAR(t.startedAt) = :year')
+            ->setParameter('year', $year)
+            ->andWhere('MONTH(t.startedAt) = :month')
+            ->setParameter('month', $month)
+            ->andWhere('t.valid = 1')
+            ->andWhere("t.image != ''")
+            ->getQuery()
+            ->getResult();
     }
 
     public function findByDay($year, $month, $day)
     {
         return $this->createQueryBuilder('t')
-             ->where('YEAR(t.startedAt) = :year')
-             ->setParameter('year', $year)
-             ->andWhere('MONTH(t.startedAt) = :month')
-             ->setParameter('month', $month)
-             ->andWhere('DAY(t.startedAt) = :day')
-             ->setParameter('day', $day)
-             ->andWhere('t.valid = 1')
-             ->orderBy('t.startedAt', 'DESC')
-             ->andWhere("t.image != ''")
-             ->getQuery()
-             ->getResult();
+            ->where('YEAR(t.startedAt) = :year')
+            ->setParameter('year', $year)
+            ->andWhere('MONTH(t.startedAt) = :month')
+            ->setParameter('month', $month)
+            ->andWhere('DAY(t.startedAt) = :day')
+            ->setParameter('day', $day)
+            ->andWhere('t.valid = 1')
+            ->orderBy('t.startedAt', 'DESC')
+            ->andWhere("t.image != ''")
+            ->getQuery()
+            ->getResult();
     }
 
     public function findProviderLinksForMonth($provider, $year, $month)
@@ -165,16 +154,16 @@ class TrackRepository extends EntityRepository
         $columnName = strtolower($provider).'Link';
 
         return $this->createQueryBuilder('t')
-             ->select('t.'.$columnName)
-             ->where('YEAR(t.startedAt) = :year')
-             ->setParameter('year', $year)
-             ->andWhere('MONTH(t.startedAt) = :month')
-             ->setParameter('month', $month)
-             ->andWhere('t.valid = 1')
-             ->andWhere('t.'.$columnName.' IS NOT NULL')
-             ->orderBy('t.startedAt', 'DESC')
-             ->getQuery()
-             ->getResult();
+            ->select('t.'.$columnName)
+            ->where('YEAR(t.startedAt) = :year')
+            ->setParameter('year', $year)
+            ->andWhere('MONTH(t.startedAt) = :month')
+            ->setParameter('month', $month)
+            ->andWhere('t.valid = 1')
+            ->andWhere('t.'.$columnName.' IS NOT NULL')
+            ->orderBy('t.startedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     public function findProviderLinksForDay($provider, $year, $month, $day)
@@ -221,5 +210,18 @@ class TrackRepository extends EntityRepository
         return $query->orderBy('t.startedAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    private function getTrackResultSetMapping()
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addEntityResult(\App\Entity\Track::class, 't');
+        $rsm->addFieldResult('t', 'id', 'id');
+        $rsm->addFieldResult('t', 'title', 'title');
+        $rsm->addFieldResult('t', 'album', 'album');
+        $rsm->addFieldResult('t', 'artist', 'artist');
+        $rsm->addFieldResult('t', 'image', 'image');
+
+        return $rsm;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\Track;
@@ -13,9 +15,9 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
  */
 final class ApiService
 {
-    const RETURN_SUCCESS = 1;
-    const RETURN_FAILURE = 0;
-    const RETURN_BAD_RESPONSE = -1;
+    public const RETURN_SUCCESS = 1;
+    public const RETURN_FAILURE = 0;
+    public const RETURN_BAD_RESPONSE = -1;
 
     /**
      * @var EntityManagerInterface
@@ -38,95 +40,6 @@ final class ApiService
     public function setParameterBag(ParameterBagInterface $params): void
     {
         $this->parameterBag = $params;
-    }
-
-    /**
-     * Get parameter from ParameterBag.
-     *
-     * @return mixed
-     */
-    private function getParameter(string $name)
-    {
-        return $this->parameterBag->get($name);
-    }
-
-    /**
-     * Runs different tests to see if this Track is really a song.
-     */
-    private function checkValid(Track $track): void
-    {
-        $title = strtolower($track->getTitle());
-        $album = strtolower($track->getAlbum());
-        $artist = strtolower($track->getArtist());
-
-        // Is it a RadioMeuh Jingle ?
-        // ex : PetiteRadiomeuh (Jingle), Jingle, ...
-        if (false !== strpos($title, 'jingle') ||
-            false !== strpos($artist, 'jingle') ||
-            false !== strpos($title, 'radiomeuh') ||
-            false !== strpos($artist, 'radiomeuh')) {
-            $track->setValid(false);
-
-            return;
-        }
-
-        // Have we got at least 2 pieces of info out of 3 ?
-        if (('' === $title && '' === $artist) ||
-            ('' === $title && '' === $album) ||
-            ('' === $album && '' === $artist)) {
-            $track->setValid(false);
-
-            return;
-        }
-
-        // Is a podcast ?
-        if (false !== strpos($title, 'podcast')) {
-            $track->setValid(false);
-
-            return;
-        }
-
-        // Is a podcast, you sure ? It might have an url instead of an album
-        if (false !== strpos($album, '.com/')) {
-            $track->setValid(false);
-
-            return;
-        }
-
-        // General exclude rules
-        // ex : Moon Tapes, La Dominicale n15, Free Your Mind n18 ...
-        foreach ($this->getParameter('excludes')['title'] as $regex) {
-            if (preg_match($regex, $title)) {
-                $track->setValid(false);
-
-                return;
-            }
-        }
-
-        foreach ($this->getParameter('excludes')['album'] as $regex) {
-            if (preg_match($regex, $album)) {
-                $track->setValid(false);
-
-                return;
-            }
-        }
-
-        foreach ($this->getParameter('excludes')['artist'] as $regex) {
-            if (preg_match($regex, $artist)) {
-                $track->setValid(false);
-
-                return;
-            }
-        }
-
-        // Is an episode of a podcast nevertheless ?
-        if (preg_match("/.*S[0-9]+\s?[\-\—]\s?Ep[0-9]+.*/", $title) || preg_match("/.*Episode\s[0-9]+.*/", $title)) {
-            $track->setValid(false);
-
-            return;
-        }
-
-        $track->setValid(true);
     }
 
     /**
@@ -343,5 +256,92 @@ final class ApiService
         }
 
         return str_replace('https://www.deezer.com/track/', '', $data->links->deezer[0]);
+    }
+
+    /**
+     * Get parameter from ParameterBag.
+     */
+    private function getParameter(string $name)
+    {
+        return $this->parameterBag->get($name);
+    }
+
+    /**
+     * Runs different tests to see if this Track is really a song.
+     */
+    private function checkValid(Track $track): void
+    {
+        $title = strtolower($track->getTitle());
+        $album = strtolower($track->getAlbum());
+        $artist = strtolower($track->getArtist());
+
+        // Is it a RadioMeuh Jingle ?
+        // ex : PetiteRadiomeuh (Jingle), Jingle, ...
+        if (false !== strpos($title, 'jingle') ||
+            false !== strpos($artist, 'jingle') ||
+            false !== strpos($title, 'radiomeuh') ||
+            false !== strpos($artist, 'radiomeuh')) {
+            $track->setValid(false);
+
+            return;
+        }
+
+        // Have we got at least 2 pieces of info out of 3 ?
+        if (('' === $title && '' === $artist) ||
+            ('' === $title && '' === $album) ||
+            ('' === $album && '' === $artist)) {
+            $track->setValid(false);
+
+            return;
+        }
+
+        // Is a podcast ?
+        if (false !== strpos($title, 'podcast')) {
+            $track->setValid(false);
+
+            return;
+        }
+
+        // Is a podcast, you sure ? It might have an url instead of an album
+        if (false !== strpos($album, '.com/')) {
+            $track->setValid(false);
+
+            return;
+        }
+
+        // General exclude rules
+        // ex : Moon Tapes, La Dominicale n15, Free Your Mind n18 ...
+        foreach ($this->getParameter('excludes')['title'] as $regex) {
+            if (preg_match($regex, $title)) {
+                $track->setValid(false);
+
+                return;
+            }
+        }
+
+        foreach ($this->getParameter('excludes')['album'] as $regex) {
+            if (preg_match($regex, $album)) {
+                $track->setValid(false);
+
+                return;
+            }
+        }
+
+        foreach ($this->getParameter('excludes')['artist'] as $regex) {
+            if (preg_match($regex, $artist)) {
+                $track->setValid(false);
+
+                return;
+            }
+        }
+
+        // Is an episode of a podcast nevertheless ?
+        if (preg_match("/.*S[0-9]+\s?[\-\—]\s?Ep[0-9]+.*/", $title) || preg_match("/.*Episode\s[0-9]+.*/", $title)) {
+            $track->setValid(false);
+
+            return;
+        }
+
+        $track->setValid(true);
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Entity\Track;
@@ -11,10 +13,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class TrackFetcherCommand extends Command
+final class TrackFetcherCommand extends Command
 {
-    private $output;
-
     /**
      * @var ApiService
      */
@@ -32,7 +32,7 @@ class TrackFetcherCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('timeuh-machine:fetch-tracks')
@@ -104,7 +104,7 @@ class TrackFetcherCommand extends Command
             foreach ($tracks as $track) {
                 $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
-                if (null != $track->getTuneefyLink()) {
+                if (null !== $track->getTuneefyLink()) {
                     $result = $this->apiService->getSpotifyLinkForTuneefyLink($track->getTuneefyLink());
                     if ($result) {
                         $track->setSpotifyLink($result);
@@ -128,7 +128,7 @@ class TrackFetcherCommand extends Command
             foreach ($tracks as $track) {
                 $output->write('<comment>Fetching missing Deezer data for track #'.$track->getId().' "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
-                if (null != $track->getTuneefyLink()) {
+                if (null !== $track->getTuneefyLink()) {
                     $result = $this->apiService->getDeezerLinkForTuneefyLink($track->getTuneefyLink());
                     if ($result) {
                         $track->setDeezerLink($result);

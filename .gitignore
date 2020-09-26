@@ -2,10 +2,12 @@
 /build/
 
 ###> symfony/framework-bundle ###
-.env.local
-.env.local.php
-.env.*.local
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
+/src/.preload.php
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
@@ -17,6 +19,7 @@
 
 ###> symfony/phpunit-bridge ###
 .phpunit
+.phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
 
@@ -30,3 +33,12 @@ deploy/vars.yml
 
 logo.psd
 TODO.todo
+###> squizlabs/php_codesniffer ###
+/.phpcs-cache
+/phpcs.xml
+###< squizlabs/php_codesniffer ###
+
+###> friendsofphp/php-cs-fixer ###
+/.php_cs.dist
+/.php_cs.cache
+###< friendsofphp/php-cs-fixer ###

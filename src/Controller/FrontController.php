@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Track;
@@ -13,14 +15,14 @@ use Symfony\Component\Routing\Annotation\Route;
  *
  * @author Cyril Chapellier
  */
-class FrontController extends AbstractController
+final class FrontController extends AbstractController
 {
     /**
      * @Route("/{page}", name="home", requirements={"page" = "\d+"}, defaults={"page" = 1})
      */
     public function homeAction(EntityManagerInterface $em, Request $request, int $page)
     {
-        $page = ($page > 1) ? $page : 1;
+        $page = $page > 1 ? $page : 1;
 
         $trackRepository = $em->getRepository(Track::class);
 
@@ -31,18 +33,18 @@ class FrontController extends AbstractController
             return $this->render('home.items.html.twig', [
                 'lastTracks' => $lastTracks,
             ]);
-        } else {
-            return $this->render('home.html.twig', [
-                'current' => $current,
-                'lastTracks' => $lastTracks,
-            ]);
         }
+
+        return $this->render('home.html.twig', [
+            'current' => $current,
+            'lastTracks' => $lastTracks,
+        ]);
     }
 
     /**
      * @Route("/about", name="about")
      */
-    public function aboutAction(Request $request)
+    public function aboutAction()
     {
         return $this->render('about.html.twig');
     }
@@ -115,27 +117,27 @@ class FrontController extends AbstractController
                 'months' => $months,
                 'year' => $year,
             ]);
-        } else {
-            // Get all tracks for all years passed
-            $tracks = $em->getRepository(Track::class)->findHighlightsByYears();
-
-            // Sort tracks by YEAR properly
-            $years = [];
-            foreach ($tracks as $track) {
-                $year = $track['year_n'];
-                if (isset($years[$year])) {
-                    $years[$year]['tracks'][] = $track[0];
-                } else {
-                    $years[$year] = [
-                        'name' => $year,
-                        'tracks' => [$track[0]],
-                    ];
-                }
-            }
-
-            return $this->render('archives.years.html.twig', [
-                'years' => $years,
-            ]);
         }
+
+        // Get all tracks for all years passed
+        $tracks = $em->getRepository(Track::class)->findHighlightsByYears();
+
+        // Sort tracks by YEAR properly
+        $years = [];
+        foreach ($tracks as $track) {
+            $year = $track['year_n'];
+            if (isset($years[$year])) {
+                $years[$year]['tracks'][] = $track[0];
+            } else {
+                $years[$year] = [
+                    'name' => $year,
+                    'tracks' => [$track[0]],
+                ];
+            }
+        }
+
+        return $this->render('archives.years.html.twig', [
+            'years' => $years,
+        ]);
     }
 }

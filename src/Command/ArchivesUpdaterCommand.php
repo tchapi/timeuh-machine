@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Command;
 
 use App\Repository\TrackRepository;
@@ -8,11 +10,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ArchivesUpdaterCommand extends Command
+final class ArchivesUpdaterCommand extends Command
 {
     const STARTING_YEAR = 2017;
 
-    private $output;
     private $trackRepository;
 
     public function __construct(TrackRepository $trackRepository)
@@ -21,7 +22,7 @@ class ArchivesUpdaterCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('timeuh-machine:update-archives')
