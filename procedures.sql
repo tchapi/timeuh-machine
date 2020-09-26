@@ -60,7 +60,7 @@ BEGIN
       SELECT *, YEAR(`started_at`) AS year_n, MONTH(`started_at`) AS month_n,
        ROW_NUMBER() OVER(PARTITION BY year_n, month_n) AS rank
       FROM `track`
-      WHERE valid = 1 AND image != ''
+      WHERE valid = 1 AND image != '' AND image != 'https://lastfm.freetls.fastly.net/i/u/174s/2a96cbd8b46e442fc41c2b86b821562f.png'
       HAVING year_n = current_year
     ) ranked
     WHERE rank <= 16
@@ -100,7 +100,7 @@ BEGIN
     FROM (
       SELECT *, YEAR(`started_at`) AS year_n, MONTH(`started_at`) AS month_n, DAY(`started_at`) AS day_n,
        ROW_NUMBER() OVER(PARTITION BY year_n, month_n, day_n) AS rank
-      FROM `track` WHERE valid = 1 AND image != '' HAVING year_n = current_year AND month_n = current_month
+      FROM `track` WHERE valid = 1 AND image != '' AND image != 'https://lastfm.freetls.fastly.net/i/u/174s/2a96cbd8b46e442fc41c2b86b821562f.png' HAVING year_n = current_year AND month_n = current_month
     ) ranked
     WHERE rank <= 8
   ;
