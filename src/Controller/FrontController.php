@@ -106,7 +106,7 @@ final class FrontController extends AbstractController
                     $months[$month]['tracks'][] = $track[0];
                 } else {
                     $months[$month] = [
-                        'name' => strftime('%B', mktime(0, 0, 0, $track['month_n'])),
+                        'name' => strftime('%B', mktime(0, 0, 0, intval($track['month_n']))),
                         'key' => $track['month_n'],
                         'tracks' => [$track[0]],
                     ];
