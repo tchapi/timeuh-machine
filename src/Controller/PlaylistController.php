@@ -28,18 +28,26 @@ final class PlaylistController extends AbstractController
      */
     public function intiateCreatePlaylist(EntityManagerInterface $em, TranslatorInterface $translator, Request $request, string $provider, int $year = null, int $month = null, ?int $day = null)
     {
-        setlocale(LC_TIME, $request->getLocale(), 'fr', 'fr_FR', 'fr_FR@euro', 'fr_FR.utf8', 'fr-FR', 'fra');
+        $formatter = new \IntlDateFormatter(
+            'fr_FR', // Could be $request->getLocale()
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::FULL,
+            'Europe/Paris',
+            \IntlDateFormatter::TRADITIONAL
+        );
 
         // Get all the tracks id
         $repository = $em->getRepository(Track::class);
 
         if ($month) {
             if ($day) {
+                $formatter->setPattern('dd/MM/yyyy');
                 $tracks = $repository->findProviderLinksForDay($provider, $year, $month, $day);
-                $name = $translator->trans('playlist.title.day', ['%date%' => strftime('%d/%m/%Y', mktime(0, 0, 0, $month, $day, $year))]);
+                $name = $translator->trans('playlist.title.day', ['%date%' => $formatter->format(mktime(0, 0, 0, $month, $day, $year))]);
             } else {
+                $formatter->setPattern('MMMM');
                 $tracks = $repository->findProviderLinksForMonth($provider, $year, $month);
-                $name = $translator->trans('playlist.title.month', ['%month%' => ucfirst(strftime('%B', mktime(0, 0, 0, $month))), '%year%' => $year]);
+                $name = $translator->trans('playlist.title.month', ['%month%' => ucfirst($formatter->format(mktime(0, 0, 0, $month))), '%year%' => $year]);
             }
         }
 

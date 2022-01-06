@@ -54,7 +54,14 @@ final class FrontController extends AbstractController
      */
     public function archivesAction(EntityManagerInterface $em, Request $request, ?int $year = null, ?int $month = null, ?int $day = null)
     {
-        setlocale(LC_TIME, $request->getLocale(), 'fr', 'fr_FR', 'fr_FR@euro', 'fr_FR.utf8', 'fr-FR', 'fra');
+        $formatter = new \IntlDateFormatter(
+            'fr_FR', // Could be $request->getLocale()
+            \IntlDateFormatter::FULL,
+            \IntlDateFormatter::FULL,
+            'Europe/Paris',
+            \IntlDateFormatter::TRADITIONAL
+        );
+        $formatter->setPattern('MMMM');
 
         if ($year) {
             if ($month) {
@@ -66,7 +73,7 @@ final class FrontController extends AbstractController
                         'tracks' => $tracks,
                         'year' => $year,
                         'month' => $month,
-                        'monthName' => strftime('%B', mktime(0, 0, 0, $month)),
+                        'monthName' => $formatter->format(mktime(0, 0, 0, $month)),
                         'day' => $day,
                     ]);
                 }
@@ -92,7 +99,7 @@ final class FrontController extends AbstractController
                     'days' => $days,
                     'year' => $year,
                     'month' => $month,
-                    'monthName' => strftime('%B', mktime(0, 0, 0, $month)),
+                    'monthName' => $formatter->format(mktime(0, 0, 0, $month)),
                 ]);
             }
 
@@ -106,7 +113,7 @@ final class FrontController extends AbstractController
                     $months[$month]['tracks'][] = $track[0];
                 } else {
                     $months[$month] = [
-                        'name' => strftime('%B', mktime(0, 0, 0, intval($track['month_n']))),
+                        'name' => $formatter->format(mktime(0, 0, 0, intval($track['month_n']))),
                         'key' => $track['month_n'],
                         'tracks' => [$track[0]],
                     ];
