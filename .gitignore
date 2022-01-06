@@ -33,11 +33,6 @@ deploy/vars.yml
 
 logo.psd
 TODO.todo
-###> squizlabs/php_codesniffer ###
-/.phpcs-cache
-/phpcs.xml
-###< squizlabs/php_codesniffer ###
-
 ###> friendsofphp/php-cs-fixer ###
 /.php_cs.dist
 /.php_cs.cache

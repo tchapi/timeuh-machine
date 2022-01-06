@@ -14,25 +14,23 @@
         "doctrine/orm": "^2.10",
         "jwilsson/spotify-web-api-php": "^4.3",
         "sensio/framework-extra-bundle": "^5.5",
-        "symfony/asset": "*",
-        "symfony/console": "*",
-        "symfony/dotenv": "*",
-        "symfony/expression-language": "*",
+        "symfony/asset": "^5.4",
+        "symfony/console": "^5.4",
+        "symfony/dotenv": "^5.4",
+        "symfony/expression-language": "^5.4",
         "symfony/flex": "^1.12",
-        "symfony/framework-bundle": "*",
+        "symfony/framework-bundle": "^5.4",
         "symfony/monolog-bundle": "^3.7",
         "symfony/proxy-manager-bridge": "5.2.*",
-        "symfony/translation": "*",
-        "symfony/twig-bundle": "*",
-        "symfony/yaml": "*"
+        "symfony/translation": "^5.4",
+        "symfony/twig-bundle": "^5.4",
+        "symfony/yaml": "^5.4"
     },
     "require-dev": {
-        "deployer/deployer": "^6.6",
-        "friendsofphp/php-cs-fixer": "^2.6",
-        "nunomaduro/phpinsights": "^1.14",
-        "symfony/phpunit-bridge": "^3.0",
-        "symfony/stopwatch": "^5.2",
-        "symfony/web-profiler-bundle": "^5.2"
+        "friendsofphp/php-cs-fixer": "^3.4",
+        "symfony/phpunit-bridge": "^5.4",
+        "symfony/stopwatch": "^5.4",
+        "symfony/web-profiler-bundle": "^5.4"
     },
     "config": {
         "preferred-install": {
@@ -41,6 +39,11 @@
         "sort-packages": true,
         "platform": {
             "php": "7.4.5"
+        },
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "symfony/flex": true
         }
     },
     "autoload": {
@@ -78,7 +81,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "5.2.*"
+            "require": "5.4.*"
         }
     }
 }
