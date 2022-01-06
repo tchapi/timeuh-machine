@@ -10,13 +10,13 @@ use Doctrine\ORM\Query\ResultSetMapping;
 
 final class TrackRepository extends EntityRepository
 {
-    const MODE_YEARS = 0;
-    const MODE_MONTHS = 1;
-    const MODE_DAYS = 2;
+    public const MODE_YEARS = 0;
+    public const MODE_MONTHS = 1;
+    public const MODE_DAYS = 2;
 
-    const MISSING_TUNEEFY = 0;
-    const MISSING_SPOTIFY = 1;
-    const MISSING_DEEZER = 2;
+    public const MISSING_TUNEEFY = 0;
+    public const MISSING_SPOTIFY = 1;
+    public const MISSING_DEEZER = 2;
 
     public function findCurrentlyPlayingTrack()
     {

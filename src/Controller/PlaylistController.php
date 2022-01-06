@@ -20,8 +20,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 final class PlaylistController extends AbstractController
 {
-    const PROVIDER_DEEZER = 'deezer';
-    const PROVIDER_SPOTIFY = 'spotify';
+    public const PROVIDER_DEEZER = 'deezer';
+    public const PROVIDER_SPOTIFY = 'spotify';
 
     /**
      * @Route("/create/playlist/{provider}/{year}/{month}/{day}", name="create_playlist", requirements={"provider" = "spotify|deezer", "year" = "\d+", "month" = "\d+", "day" = "\d+"})

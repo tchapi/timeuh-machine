@@ -98,9 +98,9 @@ final class ApiService
             // Create a track object holding the data
             $t = new Track();
             $t->setTitle(trim($track->titre));
-            $t->setAlbum(trim($track->album ?? ""));
+            $t->setAlbum(trim($track->album ?? ''));
             $t->setArtist(trim($track->artist));
-            $t->setImage(trim($track->imgSrc ?? ""));
+            $t->setImage(trim($track->imgSrc ?? ''));
             $t->setStartedAt($startingTime);
 
             // Puts a valid flag on it, depending if it's a song

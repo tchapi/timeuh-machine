@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class ArchivesUpdaterCommand extends Command
 {
-    const STARTING_YEAR = 2017;
+    public const STARTING_YEAR = 2017;
 
     private $trackRepository;
 
@@ -35,7 +35,7 @@ final class ArchivesUpdaterCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $thisYear = (new \DateTime())->format('Y');
         $thisMonth = (new \DateTime())->format('m');
@@ -69,7 +69,7 @@ final class ArchivesUpdaterCommand extends Command
 
         $output->writeln('<info>Done, quitting.</info>');
 
-        return 1;
+        return Command::SUCCESS;
     }
 
     protected function runCommand($command, InputInterface $input, OutputInterface $output)

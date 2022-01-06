@@ -63,7 +63,7 @@ final class TrackFetcherCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $trackRepository = $this->em->getRepository(Track::class);
 
@@ -157,7 +157,7 @@ final class TrackFetcherCommand extends Command
 
         $output->writeln('<info>Done, quitting.</info>');
 
-        return 1;
+        return Command::SUCCESS;
     }
 
     protected function runCommand($command, InputInterface $input, OutputInterface $output)
