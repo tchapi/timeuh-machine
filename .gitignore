@@ -30,6 +30,7 @@
 .idea/*
 
 deploy/vars.yml
+deploy/.env.*
 
 logo.psd
 TODO.todo
