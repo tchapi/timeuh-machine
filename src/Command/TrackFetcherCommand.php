@@ -59,7 +59,7 @@ final class TrackFetcherCommand extends Command
                 'from-date',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Restrict fixing missing tracks to the tracks that have been created after the date passed'
+                'Restrict fixing missing tracks to the tracks that have been created after the date passed (format: d/m/Y)'
             );
     }
 
