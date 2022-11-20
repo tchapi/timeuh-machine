@@ -18,6 +18,8 @@ parameters:
     tuneefy_token: "%env(TUNEEFY_TOKEN)%"
     spotify_client_id: "%env(SPOTIFY_CLIENT_ID)%"
     spotify_client_secret: "%env(SPOTIFY_CLIENT_SECRET)%"
+    deezer_app_id: "%env(DEEZER_APP_ID)%"
+    deezer_secret: "%env(DEEZER_SECRET)%"
     locale: 'fr'
 
 services:
