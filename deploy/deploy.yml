@@ -18,6 +18,10 @@
       file:
         path: "{{ shared_path }}"
         state: directory
+    - name: Ensure shared logs folder is present
+      file:
+        path: "{{ shared_path }}/log"
+        state: directory
     - name: Create new folder
       file:
         dest={{ release_path }}
@@ -33,6 +37,14 @@
         src={{ shared_path }}/.env.local
         dest={{ release_path }}/.env.local
         state=link
+    - name: Link logs folder
+      file:
+        src={{ shared_path }}/logs
+        dest={{ release_path }}/var/log
+        state=link
+        owner='www-data'
+        group='www-data'
+        mode='g+rw'
     - name: Install composer dependencies
       composer:
         command: install
@@ -82,5 +94,5 @@
       become: yes
       become_user: root
       service:
-        name: "php7.4-fpm"
+        name: "php8.1-fpm"
         state: restarted
