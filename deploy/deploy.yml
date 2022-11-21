@@ -37,9 +37,13 @@
         src={{ shared_path }}/.env.local
         dest={{ release_path }}/.env.local
         state=link
-    - name: Link logs folder
+    - name: Ensure var is preent
       file:
-        src={{ shared_path }}/logs
+        path: "{{ release_path }}/var"
+        state: directory
+    - name: Link log folder
+      file:
+        src={{ shared_path }}/log
         dest={{ release_path }}/var/log
         state=link
         owner='www-data'
