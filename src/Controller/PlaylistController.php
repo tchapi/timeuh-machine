@@ -38,6 +38,7 @@ final class PlaylistController extends AbstractController
 
         // Get all the tracks id
         $repository = $em->getRepository(Track::class);
+        $provider = strtolower($provider);
 
         if ($month) {
             if ($day) {
@@ -63,8 +64,10 @@ final class PlaylistController extends AbstractController
 
         // flatten array
         array_walk($tracks, static function (&$item) use ($provider): void {
-            $item = $item[strtolower($provider).'Link'];
+            $item = $item[$provider.'Link'];
         });
+
+        $tracks = array_unique($tracks);
 
         // Store the tracks, name of the playlist, playlist image and referer url in session
         $session = $request->getSession();

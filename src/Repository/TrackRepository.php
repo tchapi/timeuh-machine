@@ -151,7 +151,7 @@ final class TrackRepository extends EntityRepository
 
     public function findProviderLinksForMonth($provider, $year, $month)
     {
-        $columnName = strtolower($provider).'Link';
+        $columnName = $provider.'Link';
 
         return $this->createQueryBuilder('t')
             ->select('t.'.$columnName)
@@ -168,7 +168,7 @@ final class TrackRepository extends EntityRepository
 
     public function findProviderLinksForDay($provider, $year, $month, $day)
     {
-        $columnName = strtolower($provider).'Link';
+        $columnName = $provider.'Link';
 
         return $this->createQueryBuilder('t')
             ->select('t.'.$columnName)

@@ -114,15 +114,20 @@ final class DeezerApi
             throw new \Exception('Deezer API: Could not get user playlists');
         }
 
-        $playlists = json_decode($response);
+        $playlists = json_decode($response, true);
 
         # Conform to Spotify API structure
-        foreach ($playlists as $playlist) {
-            $playlist->id = strval($playlist->id);
-            $playlist->name = $playlist->title;
+        $items = [];
+        foreach ($playlists['data'] as $playlist) {
+            $item = new \stdClass();
+            $item->id = strval($playlist['id']);
+            $item->name = $playlist['title'];
+            $items[] = $item;
         }
 
-        return $playlists;
+        return (object) [
+            'items' => $items
+        ];
     }
 
     public function createPlaylist(array $params)
@@ -167,7 +172,7 @@ final class DeezerApi
 
         curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => $this->createApiUri($endpoint),
+            CURLOPT_URL => $this->createApiUri($endpoint, ['limit' => 3000]),
         ]);
 
         $response = curl_exec($curlHandler);
@@ -177,7 +182,20 @@ final class DeezerApi
             throw new \Exception('Deezer API: Could not get tracks');
         }
 
-        return json_decode($response);
+        $tracks = json_decode($response, true);
+
+        # Conform to Spotify API structure
+        $items = [];
+        foreach ($tracks['data'] as $track) {
+            $item = new \stdClass();
+            $item->track = new \stdClass();
+            $item->track->uri = $track['id'];
+            $items[] = $item;
+        }
+
+        return (object) [
+            'items' => $items
+        ];
     }
 
     public function addPlaylistTracks(string $playlistId, array $tracks): void
@@ -206,12 +224,12 @@ final class DeezerApi
         }
     }
 
-    private function createApiUri(string $endpoint)
+    private function createApiUri(string $endpoint, array $params = [])
     {
-        $auth = [
+        $query = array_merge([
             'access_token' => $this->access_token,
-        ];
+        ], $params);
 
-        return $endpoint.'?'.http_build_query($auth);
+        return $endpoint.'?'.http_build_query($query);
     }
 }
