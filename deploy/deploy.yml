@@ -37,7 +37,7 @@
         src={{ shared_path }}/.env.local
         dest={{ release_path }}/.env.local
         state=link
-    - name: Ensure var is preent
+    - name: Ensure var is present
       file:
         path: "{{ release_path }}/var"
         state: directory
