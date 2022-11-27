@@ -41,6 +41,9 @@
       file:
         path: "{{ release_path }}/var"
         state: directory
+        group: 'www-data'
+        mode: 'g+rw'
+        recurse: yes
     - name: Link log folder
       file:
         src={{ shared_path }}/log
