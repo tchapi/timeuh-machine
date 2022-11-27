@@ -114,7 +114,15 @@ final class DeezerApi
             throw new \Exception('Deezer API: Could not get user playlists');
         }
 
-        return json_decode($response);
+        $playlists = json_decode($response);
+
+        # Conform to Spotify API structure
+        foreach ($playlists as $playlist) {
+            $playlist->id = strval($playlist->id);
+            $playlist->name = $playlist->title;
+        }
+
+        return $playlists;
     }
 
     public function createPlaylist(array $params)
@@ -129,7 +137,7 @@ final class DeezerApi
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_POST => 1,
             CURLOPT_URL => $this->createApiUri(self::PLAYLISTS_ENDPOINT),
-            CURLOPT_POSTFIELDS => http_build_query(['title' => $params['title']]),
+            CURLOPT_POSTFIELDS => http_build_query(['title' => $params['name']]),
         ]);
 
         $response = curl_exec($curlHandler);
@@ -139,7 +147,12 @@ final class DeezerApi
             throw new \Exception('Deezer API: Could not create playlist');
         }
 
-        return json_decode($response);
+        $playlist = json_decode($response);
+
+        # Conform to Spotify API structure
+        $playlist->id = strval($playlist->id);
+
+        return $playlist;
     }
 
     public function getPlaylistTracks(string $playlistId)
