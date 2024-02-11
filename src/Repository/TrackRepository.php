@@ -20,7 +20,7 @@ final class TrackRepository extends EntityRepository
 
     public function findCurrentlyPlayingTrack()
     {
-        $limit = new \Datetime('now - 30 minutes');
+        $limit = new \DateTime('now - 30 minutes');
 
         return $this->createQueryBuilder('t')
             ->where('t.startedAt > :limit')
@@ -91,7 +91,7 @@ final class TrackRepository extends EntityRepository
         return $query->getResult();
     }
 
-    public function updateHighlights(int $mode, string $year, ?string $month = null)
+    public function updateHighlights(int $mode, int $year, ?int $month = null)
     {
         $connection = $this->getEntityManager()
             ->getConnection()
@@ -185,7 +185,7 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findMissingTracksFrom(int $what = self::MISSING_TUNEEFY, \Datetime $fromDate = null)
+    public function findMissingTracksFrom(int $what = self::MISSING_TUNEEFY, ?\DateTime $fromDate = null)
     {
         $query = $this->createQueryBuilder('t');
 
@@ -215,7 +215,7 @@ final class TrackRepository extends EntityRepository
     private function getTrackResultSetMapping()
     {
         $rsm = new ResultSetMapping();
-        $rsm->addEntityResult(\App\Entity\Track::class, 't');
+        $rsm->addEntityResult(Track::class, 't');
         $rsm->addFieldResult('t', 'id', 'id');
         $rsm->addFieldResult('t', 'title', 'title');
         $rsm->addFieldResult('t', 'album', 'album');

@@ -116,7 +116,7 @@ final class DeezerApi
 
         $playlists = json_decode($response, true);
 
-        # Conform to Spotify API structure
+        // Conform to Spotify API structure
         $items = [];
         foreach ($playlists['data'] as $playlist) {
             $item = new \stdClass();
@@ -126,7 +126,7 @@ final class DeezerApi
         }
 
         return (object) [
-            'items' => $items
+            'items' => $items,
         ];
     }
 
@@ -154,7 +154,7 @@ final class DeezerApi
 
         $playlist = json_decode($response);
 
-        # Conform to Spotify API structure
+        // Conform to Spotify API structure
         $playlist->id = strval($playlist->id);
 
         return $playlist;
@@ -184,7 +184,7 @@ final class DeezerApi
 
         $tracks = json_decode($response, true);
 
-        # Conform to Spotify API structure
+        // Conform to Spotify API structure
         $items = [];
         foreach ($tracks['data'] as $track) {
             $item = new \stdClass();
@@ -194,7 +194,7 @@ final class DeezerApi
         }
 
         return (object) [
-            'items' => $items
+            'items' => $items,
         ];
     }
 

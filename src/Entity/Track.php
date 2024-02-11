@@ -6,65 +6,40 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="App\Repository\TrackRepository")
- *
- * @ORM\Table(name="track")
- */
+#[ORM\Entity(repositoryClass: "App\Repository\TrackRepository")]
+#[ORM\Table(name: 'track')]
 class Track
 {
-    /**
-     * @ORM\Id
-     *
-     * @ORM\Column(type="integer")
-     *
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[ORM\Column(type: 'integer')]
     private $id;
 
-    /**
-     * @ORM\Column(type="string", nullable=false)
-     */
+    #[ORM\Column(type: 'string', nullable: false)]
     private $title;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     private $album;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     private $artist;
 
-    /**
-     * @ORM\Column(type="datetime")
-     */
+    #[ORM\Column(type: 'datetime')]
     private $startedAt;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     private $image;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     private $tuneefyLink;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     private $spotifyLink;
 
-    /**
-     * @ORM\Column(type="string", nullable=true)
-     */
+    #[ORM\Column(type: 'string', nullable: true)]
     private $deezerLink;
 
-    /**
-     * @ORM\Column(type="boolean", nullable=true)
-     */
+    #[ORM\Column(type: 'boolean', nullable: true)]
     private $valid;
 
     /**
@@ -72,9 +47,9 @@ class Track
      */
     public function clean(): void
     {
-        if (null === $this->title &&
-            preg_match("(?P<artist>[^\-\—]*)\s+[\-\–]\s+(?P<title>[^\-\—]*)", $this->artist, $matches)
-            ) {
+        if (null === $this->title
+            && preg_match("(?P<artist>[^\-\—]*)\s+[\-\–]\s+(?P<title>[^\-\—]*)", $this->artist, $matches)
+        ) {
             $this->artist = $matches['artist'];
             $this->title = $matches['title'];
         }

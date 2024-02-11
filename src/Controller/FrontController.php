@@ -17,9 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 final class FrontController extends AbstractController
 {
-    /**
-     * @Route("/{page}", name="home", requirements={"page" = "\d+"}, defaults={"page" = 1})
-     */
+    #[Route('/{page}', name: 'home', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function homeAction(EntityManagerInterface $em, Request $request, int $page)
     {
         $page = $page > 1 ? $page : 1;
@@ -41,17 +39,13 @@ final class FrontController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/about", name="about")
-     */
+    #[Route('/about', name: 'about')]
     public function aboutAction()
     {
         return $this->render('about.html.twig');
     }
 
-    /**
-     * @Route("/archives/{year}/{month}/{day}", name="archives", requirements={"year" = "\d+", "month" = "\d+", "day" = "\d+"})
-     */
+    #[Route('/archives/{year}/{month}/{day}', name: 'archives', requirements: ['year' => '\d+', 'month' => '\d+', 'day' => '\d+'])]
     public function archivesAction(EntityManagerInterface $em, Request $request, ?int $year = null, ?int $month = null, ?int $day = null)
     {
         $formatter = new \IntlDateFormatter(

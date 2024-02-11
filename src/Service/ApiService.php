@@ -83,9 +83,9 @@ final class ApiService
             // on that to see if we've hit the same playlist or not in this call.
             // BUT we have to be cautious since only the HH:mm:ss is indicated in
             // the API result.
-            $startingTime = new \Datetime($track->time);
+            $startingTime = new \DateTime($track->time);
 
-            if (intval($startingTime->format('H')) > 20 && intval((new \Datetime())->format('H')) < 2) {
+            if (intval($startingTime->format('H')) > 20 && intval((new \DateTime())->format('H')) < 2) {
                 // We have hit a track that was played yesterday, and not today
                 // Post 20:00, if we're the day after, suppose that it was yesterday
                 $startingTime->sub(new \DateInterval('P1D'));
@@ -277,19 +277,19 @@ final class ApiService
 
         // Is it a RadioMeuh Jingle ?
         // ex : PetiteRadiomeuh (Jingle), Jingle, ...
-        if (false !== strpos($title, 'jingle') ||
-            false !== strpos($artist, 'jingle') ||
-            false !== strpos($title, 'radiomeuh') ||
-            false !== strpos($artist, 'radiomeuh')) {
+        if (false !== strpos($title, 'jingle')
+            || false !== strpos($artist, 'jingle')
+            || false !== strpos($title, 'radiomeuh')
+            || false !== strpos($artist, 'radiomeuh')) {
             $track->setValid(false);
 
             return;
         }
 
         // Have we got at least 2 pieces of info out of 3 ?
-        if (('' === $title && '' === $artist) ||
-            ('' === $title && '' === $album) ||
-            ('' === $album && '' === $artist)) {
+        if (('' === $title && '' === $artist)
+            || ('' === $title && '' === $album)
+            || ('' === $album && '' === $artist)) {
             $track->setValid(false);
 
             return;

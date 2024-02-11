@@ -64,7 +64,7 @@ final class ArchivesUpdaterCommand extends Command
             $this->trackRepository->updateHighlights(TrackRepository::MODE_MONTHS, $thisYear);
 
             $output->writeln('<comment>Updating Days highlights for '.$thisYear.'/'.$thisMonth.'.</comment>');
-            $this->trackRepository->updateHighlights(TrackRepository::MODE_DAYS, $thisYear, $thisMonth);
+            $this->trackRepository->updateHighlights(TrackRepository::MODE_DAYS, $thisYear, int($thisMonth));
         }
 
         $output->writeln('<info>Done, quitting.</info>');

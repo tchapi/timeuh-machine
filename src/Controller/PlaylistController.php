@@ -23,10 +23,8 @@ final class PlaylistController extends AbstractController
     public const PROVIDER_DEEZER = 'deezer';
     public const PROVIDER_SPOTIFY = 'spotify';
 
-    /**
-     * @Route("/create/playlist/{provider}/{year}/{month}/{day}", name="create_playlist", requirements={"provider" = "spotify|deezer", "year" = "\d+", "month" = "\d+", "day" = "\d+"})
-     */
-    public function intiateCreatePlaylist(EntityManagerInterface $em, TranslatorInterface $translator, Request $request, string $provider, int $year = null, int $month = null, ?int $day = null)
+    #[Route('/create/playlist/{provider}/{year}/{month}/{day}', name: 'create_playlist', requirements: ['provider' => 'spotify|deezer', 'year' => "\d+", 'month' => "\d+", 'day' => "\d+"])]
+    public function intiateCreatePlaylist(EntityManagerInterface $em, TranslatorInterface $translator, Request $request, string $provider, ?int $year = null, ?int $month = null, ?int $day = null)
     {
         $formatter = new \IntlDateFormatter(
             'fr_FR', // Could be $request->getLocale()
@@ -111,9 +109,7 @@ final class PlaylistController extends AbstractController
         return $this->redirect($wrapper->getAuthorizeUrl($options));
     }
 
-    /**
-     * @Route("/finalize/playlist/{provider}", name="finalize_playlist", requirements={"provider" = "spotify|deezer"})
-     */
+    #[Route('/finalize/playlist/{provider}', name: 'finalize_playlist', requirements: ['provider' => 'spotify|deezer'])]
     public function finalizeCreatePlaylist(TranslatorInterface $translator, Request $request, string $provider)
     {
         // Retrieves the stored session info

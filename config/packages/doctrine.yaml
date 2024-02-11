@@ -1,8 +1,6 @@
 doctrine:
     dbal:
-        # configure these for your database server
         driver: 'pdo_mysql'
-        server_version: '5.7'
         charset: utf8mb4
         default_table_options:
             charset: utf8mb4
@@ -11,12 +9,14 @@ doctrine:
         url: '%env(resolve:DATABASE_URL)%'
     orm:
         auto_generate_proxy_classes: true
+        report_fields_where_declared: true
+        enable_lazy_ghost_objects: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         mappings:
             App:
                 is_bundle: false
-                type: annotation
+                type: attribute
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
