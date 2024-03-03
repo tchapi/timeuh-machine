@@ -95,7 +95,7 @@ final class TrackFetcherCommand extends Command
                 }
             }
 
-            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
+            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
         } elseif ($input->getOption('fix-spotify')) {
             $output->writeln('<info>Fixing missing Spotify data in database</info>');
             $tracks = $trackRepository->findMissingTracksFrom(TrackRepository::MISSING_SPOTIFY, $fromDate ?? null);
@@ -119,7 +119,7 @@ final class TrackFetcherCommand extends Command
                 }
             }
 
-            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
+            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
         } elseif ($input->getOption('fix-deezer')) {
             $output->writeln('<info>Fixing missing Deezer data in database</info>');
             $tracks = $trackRepository->findMissingTracksFrom(TrackRepository::MISSING_DEEZER, $fromDate ?? null);
@@ -143,7 +143,7 @@ final class TrackFetcherCommand extends Command
                 }
             }
 
-            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
+            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
         } else {
             $output->writeln('<info>Fetching data from API</info>');
             $code = $this->apiService->getCurrentAndLastTrack();

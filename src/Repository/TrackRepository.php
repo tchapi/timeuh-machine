@@ -133,7 +133,7 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findByDay($year, $month, $day)
+    public function findByDay(int $year, int $month, int $day)
     {
         return $this->createQueryBuilder('t')
             ->where('YEAR(t.startedAt) = :year')
@@ -149,7 +149,7 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findProviderLinksForMonth($provider, $year, $month)
+    public function findProviderLinksForMonth(string $provider, int $year, int $month)
     {
         $columnName = $provider.'Link';
 
@@ -166,7 +166,7 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findProviderLinksForDay($provider, $year, $month, $day)
+    public function findProviderLinksForDay(string $provider, int $year, int $month, int $day)
     {
         $columnName = $provider.'Link';
 

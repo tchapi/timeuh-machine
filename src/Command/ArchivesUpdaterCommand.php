@@ -37,8 +37,8 @@ final class ArchivesUpdaterCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $thisYear = (new \DateTime())->format('Y');
-        $thisMonth = (new \DateTime())->format('m');
+        $thisYear = intval((new \DateTime())->format('Y'));
+        $thisMonth = intval((new \DateTime())->format('m'));
 
         if ($input->getOption('from-all-time')) {
             foreach (range(self::STARTING_YEAR, $thisYear) as $year) {
@@ -64,7 +64,7 @@ final class ArchivesUpdaterCommand extends Command
             $this->trackRepository->updateHighlights(TrackRepository::MODE_MONTHS, $thisYear);
 
             $output->writeln('<comment>Updating Days highlights for '.$thisYear.'/'.$thisMonth.'.</comment>');
-            $this->trackRepository->updateHighlights(TrackRepository::MODE_DAYS, $thisYear, int($thisMonth));
+            $this->trackRepository->updateHighlights(TrackRepository::MODE_DAYS, $thisYear, $thisMonth);
         }
 
         $output->writeln('<info>Done, quitting.</info>');
