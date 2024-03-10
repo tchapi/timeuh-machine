@@ -39,6 +39,6 @@ This is the Timeuh Machine
       php -S localhost:9000 -t public
       # L'interface est maintenant dispo à http://localhost:9000
 
-Basé sur [Symfony 5](https://symfony.com/).
+Basé sur [Symfony 7](https://symfony.com/).
 
 Toutes les pull requests sont les bienvenues !
