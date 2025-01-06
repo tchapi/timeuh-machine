@@ -78,7 +78,7 @@ final class TrackFetcherCommand extends Command
             $counter = 0;
 
             foreach ($tracks as $track) {
-                $output->write('<comment>Fetching missing data for track #'.$track->getId().' "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+                $output->write('<comment>Fetching missing data for track #'.$track->getId().' (aired '.$track->getStartedAt().') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
                 $result = $this->apiService->getTuneefyLinkAndImage($track);
                 if ($result) {
@@ -102,7 +102,7 @@ final class TrackFetcherCommand extends Command
             $counter = 0;
 
             foreach ($tracks as $track) {
-                $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+                $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' (aired '.$track->getStartedAt().') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
                 if (null !== $track->getTuneefyLink()) {
                     $result = $this->apiService->getSpotifyLinkForTuneefyLink($track->getTuneefyLink());
@@ -126,7 +126,7 @@ final class TrackFetcherCommand extends Command
             $counter = 0;
 
             foreach ($tracks as $track) {
-                $output->write('<comment>Fetching missing Deezer data for track #'.$track->getId().' "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+                $output->write('<comment>Fetching missing Deezer data for track #'.$track->getId().' (aired '.$track->getStartedAt().') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
                 if (null !== $track->getTuneefyLink()) {
                     $result = $this->apiService->getDeezerLinkForTuneefyLink($track->getTuneefyLink());
