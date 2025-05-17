@@ -20,8 +20,11 @@
         <a href="{{ path('create_playlist', {provider: 'spotify', year: year, month: month.key}) }}?referer={{ path('archives', {year: year}) }}#{{ month.name }}" class="ui button spotify" style="border-radius: 0px">
           <i class="ui icon spotify"></i> Spotify
         </a>
-        <a href="{{ path('create_playlist', {provider: 'deezer', year: year, month: month.key}) }}?referer={{ path('archives', {year: year}) }}#{{ month.name }}" class="ui button black">
+        <a href="{{ path('create_playlist', {provider: 'deezer', year: year, month: month.key}) }}?referer={{ path('archives', {year: year}) }}#{{ month.name }}" class="ui button black" style="border-radius: 0px">
           <i class="ui icon music"></i> Deezer
+        </a>
+        <a href="{{ path('create_playlist', {provider: 'qobuz', year: year, month: month.key}) }}?referer={{ path('archives', {year: year}) }}#{{ month.name }}" class="ui button blue">
+          <i class="ui icon music"></i> Qobuz
         </a>
       </span>
     </p>

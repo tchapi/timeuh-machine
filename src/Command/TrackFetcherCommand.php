@@ -56,6 +56,12 @@ final class TrackFetcherCommand extends Command
                 'Does not fetch the last tracks but rather fix missing Deezer information in the whole database'
             )
             ->addOption(
+                'fix-qobuz',
+                null,
+                InputOption::VALUE_NONE,
+                'Does not fetch the last tracks but rather fix missing Qobuz information in the whole database'
+            )
+            ->addOption(
                 'from-date',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -102,7 +108,7 @@ final class TrackFetcherCommand extends Command
             $counter = 0;
 
             foreach ($tracks as $track) {
-                $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' (aired '.$track->getStartedAt().') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+                $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' (aired '.$track->getStartedAt()->format('d/m/Y H:i').') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
                 if (null !== $track->getTuneefyLink()) {
                     $result = $this->apiService->getSpotifyLinkForTuneefyLink($track->getTuneefyLink());
@@ -126,12 +132,36 @@ final class TrackFetcherCommand extends Command
             $counter = 0;
 
             foreach ($tracks as $track) {
-                $output->write('<comment>Fetching missing Deezer data for track #'.$track->getId().' (aired '.$track->getStartedAt().') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+                $output->write('<comment>Fetching missing Deezer data for track #'.$track->getId().' (aired '.$track->getStartedAt()->format('d/m/Y H:i').') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
                 if (null !== $track->getTuneefyLink()) {
                     $result = $this->apiService->getDeezerLinkForTuneefyLink($track->getTuneefyLink());
                     if ($result) {
                         $track->setDeezerLink($result);
+                        $this->em->flush();
+                        $output->writeln('<info>Done.</info>');
+                        ++$counter;
+                    } else {
+                        $output->writeln('<error>No result.</error>');
+                    }
+                } else {
+                    $output->writeln('<comment>No tuneefy link, skipping.</comment>');
+                }
+            }
+
+            $output->writeln($counter.' tracks updated — still '.(count($tracks) - $counter).' with missing info');
+        } elseif ($input->getOption('fix-qobuz')) {
+            $output->writeln('<info>Fixing missing Qobuz data in database</info>');
+            $tracks = $trackRepository->findMissingTracksFrom(TrackRepository::MISSING_QOBUZ, $fromDate ?? null);
+            $counter = 0;
+
+            foreach ($tracks as $track) {
+                $output->write('<comment>Fetching missing Qobuz data for track #'.$track->getId().' (aired '.$track->getStartedAt()->format('d/m/Y H:i').') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+
+                if (null !== $track->getTuneefyLink()) {
+                    $result = $this->apiService->getQobuzLinkForTuneefyLink($track->getTuneefyLink());
+                    if ($result) {
+                        $track->setQobuzLink($result);
                         $this->em->flush();
                         $output->writeln('<info>Done.</info>');
                         ++$counter;
