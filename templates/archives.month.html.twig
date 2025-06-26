@@ -23,6 +23,9 @@
         <a href="{{ path('create_playlist', {provider: 'deezer', year: year, month: month, day: day.key}) }}?referer={{ path('archives', {year: year, month: month}) }}#{{ monthName }}{{ day.name }}" class="ui button black">
           <i class="ui icon music"></i> Deezer
         </a>
+        <a href="{{ path('create_playlist', {provider: 'qobuz', year: year, month: month, day: day.key}) }}?referer={{ path('archives', {year: year, month: month}) }}#{{ day.name }}" class="ui button blue">
+          <i class="ui icon music"></i> Qobuz
+        </a>
       </span>
     </p>
     <div class="ui eight cards doubling">

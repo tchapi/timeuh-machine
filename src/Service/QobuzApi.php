@@ -10,7 +10,9 @@ final class QobuzApi
 
     private const TOKEN_ENDPOINT = 'https://www.qobuz.com/api.json/0.2/oauth2/token';
     private const PLAYLISTS_ENDPOINT = 'https://www.qobuz.com/api.json/0.2/playlist/getUserPlaylists?sort=updated_at&order=desc&offset=0'; // &limit=5
-    private const PLAYLISTS_TRACKS_ENDPOINT = 'https://www.qobuz.com/api.json/0.2/playlist/get?playlist_id=%s&extra=tracks'; // &limit=2
+    private const PLAYLIST_TRACKS_ENDPOINT = 'https://www.qobuz.com/api.json/0.2/playlist/get';
+    private const PLAYLIST_CREATE_ENDPOINT = 'https://www.qobuz.com/api.json/0.2/playlist/create';
+    private const PLAYLIST_ADD_TRACKS_ENDPOINT = 'https://www.qobuz.com/api.json/0.2/playlist/addTracks';
 
     /**
      * @var string
@@ -88,7 +90,7 @@ final class QobuzApi
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_URL => self::TOKEN_ENDPOINT,
             CURLOPT_POST => 1,
-            CURLOPT_POSTFIELDS => $formData
+            CURLOPT_POSTFIELDS => $formData,
         ]);
 
         $response = curl_exec($curlHandler);
@@ -100,11 +102,11 @@ final class QobuzApi
 
         $token_info = json_decode($response);
 
-        if (is_null($token_info) || $token_info->status === "error") {
+        if (is_null($token_info)) {
             throw new \Exception('Qobuz API: Could not parse response');
         }
 
-        if ($token_info->status === "error") {
+        if (isset($token_info->status) && 'error' === $token_info->status) {
             throw new \Exception('Qobuz API: Error. '.$token_info->message);
         }
 
@@ -112,7 +114,7 @@ final class QobuzApi
         $this->expire = new \DateTime('now + '.((int) $token_info->expires_in).'seconds');
     }
 
-    public function getUserPlaylists()
+    public function getUserPlaylists(): \stdClass
     {
         if (!$this->access_token || $this->expire < new \DateTime()) {
             throw new \Exception('Qobuz API: Missing access token or token expired');
@@ -135,12 +137,16 @@ final class QobuzApi
 
         $playlists = json_decode($response, true);
 
+        if (!isset($playlists['playlists']) || !isset($playlists['playlists']['items'])) {
+            throw new \Exception('Qobuz API: Missing playlists>items key in the playlists response');
+        }
+
         // Conform to Spotify API structure
         $items = [];
-        foreach ($playlists['data'] as $playlist) {
+        foreach ($playlists['playlists']['items'] as $playlist) {
             $item = new \stdClass();
             $item->id = strval($playlist['id']);
-            $item->name = $playlist['title'];
+            $item->name = $playlist['name'];
             $items[] = $item;
         }
 
@@ -149,19 +155,19 @@ final class QobuzApi
         ];
     }
 
-    public function createPlaylist(array $params)
+    public function createPlaylist(array $params): \stdClass
     {
         if (!$this->access_token || $this->expire < new \DateTime()) {
             throw new \Exception('Qobuz API: Missing access token or token expired');
         }
 
-        $curlHandler = curl_init();
+        $queryParams = ['name' => $params['name'], 'is_public' => false];
 
+        $curlHandler = curl_init();
         curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_POST => 1,
-            CURLOPT_URL => $this->createApiUri(self::PLAYLISTS_ENDPOINT),
-            CURLOPT_POSTFIELDS => http_build_query(['title' => $params['name']]),
+            CURLOPT_URL => $this->createApiUri(self::PLAYLIST_CREATE_ENDPOINT, $queryParams),
             CURLOPT_HTTPHEADER => $this->createApiHeaders(),
         ]);
 
@@ -172,27 +178,27 @@ final class QobuzApi
             throw new \Exception('Qobuz API: Could not create playlist');
         }
 
-        $playlist = json_decode($response);
+        $result = json_decode($response, true);
 
         // Conform to Spotify API structure
-        $playlist->id = strval($playlist->id);
+        $playlist = new \stdClass();
+        $playlist->id = strval($result['id']);
 
         return $playlist;
     }
 
-    public function getPlaylistTracks(string $playlistId)
+    public function getPlaylistTracks(string $playlistId): \stdClass
     {
         if (!$this->access_token || $this->expire < new \DateTime()) {
             throw new \Exception('Qobuz API: Missing access token or token expired');
         }
 
-        $endpoint = str_replace('%s', $playlistId, self::PLAYLISTS_TRACKS_ENDPOINT);
+        $queryParams = ['playlist_id' => $playlistId, 'extra' => 'tracks', 'limit' => 3000];
 
         $curlHandler = curl_init();
-
         curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL => $this->createApiUri($endpoint),
+            CURLOPT_URL => $this->createApiUri(self::PLAYLIST_TRACKS_ENDPOINT, $queryParams),
             CURLOPT_HTTPHEADER => $this->createApiHeaders(),
         ]);
 
@@ -205,12 +211,16 @@ final class QobuzApi
 
         $tracks = json_decode($response, true);
 
+        if (!isset($tracks['tracks']) || !isset($tracks['tracks']['items'])) {
+            throw new \Exception('Qobuz API: Missing tracks>items key in the tracks response');
+        }
+
         // Conform to Spotify API structure
         $items = [];
-        foreach ($tracks['data'] as $track) {
+        foreach ($tracks['tracks']['items'] as $track) {
             $item = new \stdClass();
             $item->track = new \stdClass();
-            $item->track->uri = $track['id'];
+            $item->track->uri = strval($track['id']);
             $items[] = $item;
         }
 
@@ -225,16 +235,13 @@ final class QobuzApi
             throw new \Exception('Qobuz API: Missing access token or token expired');
         }
 
-        $tracks_param = implode(',', $tracks);
-        $endpoint = str_replace('%s', $playlistId, self::PLAYLISTS_TRACKS_ENDPOINT);
+        $queryParams = ['playlist_id' => $playlistId, 'track_ids' => implode(',', $tracks)];
 
         $curlHandler = curl_init();
-
         curl_setopt_array($curlHandler, [
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_POST => 1,
-            CURLOPT_URL => $this->createApiUri($endpoint),
-            CURLOPT_POSTFIELDS => http_build_query(['songs' => $tracks_param]),
+            CURLOPT_URL => $this->createApiUri(self::PLAYLIST_ADD_TRACKS_ENDPOINT, $queryParams),
             CURLOPT_HTTPHEADER => $this->createApiHeaders(),
         ]);
 
@@ -256,7 +263,7 @@ final class QobuzApi
         return [
             'Content-Type: application/json',
             'X-App-Id: '.$this->app_id,
-            'Authorization: Bearer '.$this->access_token
+            'Authorization: Bearer '.$this->access_token,
         ];
     }
 }
