@@ -39,6 +39,9 @@ class Track
     #[ORM\Column(type: 'string', nullable: true)]
     private $deezerLink;
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private $qobuzLink;
+
     #[ORM\Column(type: 'boolean', nullable: true)]
     private $valid;
 
@@ -289,5 +292,29 @@ class Track
     public function getDeezerLink()
     {
         return $this->deezerLink;
+    }
+
+    /**
+     * Set qobuzLink.
+     *
+     * @param string $qobuzLink
+     *
+     * @return Track
+     */
+    public function setQobuzLink($qobuzLink)
+    {
+        $this->qobuzLink = $qobuzLink;
+
+        return $this;
+    }
+
+    /**
+     * Get qobuzLink.
+     *
+     * @return string
+     */
+    public function getQobuzLink()
+    {
+        return $this->qobuzLink;
     }
 }

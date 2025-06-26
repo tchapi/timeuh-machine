@@ -114,6 +114,7 @@ final class ApiService
                     $t->setTuneefyLink($result['link']);
                     $t->setSpotifyLink($result['spotifyLink']);
                     $t->setDeezerLink($result['deezerLink']);
+                    $t->setQobuzLink($result['qobuzLink']);
                     if ($result['image']) {
                         $t->setImage($result['image']);
                     }
@@ -175,6 +176,13 @@ final class ApiService
             $deezerLink = null;
         }
 
+        if (isset($data->results[0]->musical_entity->links->qobuz)) {
+            $qobuzLink = $data->results[0]->musical_entity->links->qobuz[0];
+            $qobuzLink = str_replace('https://open.qobuz.com/track/', '', $qobuzLink);
+        } else {
+            $qobuzLink = null;
+        }
+
         // Get the link
         $ch = curl_init();
 
@@ -204,6 +212,7 @@ final class ApiService
             'link' => $data->link,
             'spotifyLink' => $spotifyLink,
             'deezerLink' => $deezerLink,
+            'qobuzLink' => $qobuzLink,
             'image' => $image,
         ];
     }
@@ -256,6 +265,31 @@ final class ApiService
         }
 
         return str_replace('https://www.deezer.com/track/', '', $data->links->deezer[0]);
+    }
+
+    public function getQobuzLinkForTuneefyLink(string $tuneefyLink): ?string
+    {
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_URL => $tuneefyLink.'?format=json',
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        if (!$response) {
+            return null;
+        }
+
+        $data = json_decode($response, false);
+
+        if (!isset($data->links->qobuz)) {
+            return null;
+        }
+
+        return str_replace('https://open.qobuz.com/track/', '', $data->links->qobuz[0]);
     }
 
     /**

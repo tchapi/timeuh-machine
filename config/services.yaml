@@ -20,6 +20,10 @@ parameters:
     spotify_client_secret: "%env(SPOTIFY_CLIENT_SECRET)%"
     deezer_app_id: "%env(DEEZER_APP_ID)%"
     deezer_secret: "%env(DEEZER_SECRET)%"
+    qobuz_app_id: "%env(QOBUZ_APP_ID)%"
+    qobuz_app_secret: "%env(QOBUZ_APP_SECRET)%"
+    qobuz_client_id: "%env(QOBUZ_CLIENT_ID)%"
+    qobuz_client_secret: "%env(QOBUZ_CLIENT_SECRET)%"
     locale: 'fr'
 
 services:

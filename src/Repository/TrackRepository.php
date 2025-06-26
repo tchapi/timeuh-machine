@@ -17,6 +17,7 @@ final class TrackRepository extends EntityRepository
     public const MISSING_TUNEEFY = 0;
     public const MISSING_SPOTIFY = 1;
     public const MISSING_DEEZER = 2;
+    public const MISSING_QOBUZ = 3;
 
     public function findCurrentlyPlayingTrack()
     {
@@ -199,6 +200,10 @@ final class TrackRepository extends EntityRepository
         } elseif (self::MISSING_DEEZER === $what) {
             $query->where('t.tuneefyLink IS NOT NULL')
                 ->andWhere('t.deezerLink IS NULL')
+                ->andWhere('t.valid = 1');
+        } elseif (self::MISSING_QOBUZ === $what) {
+            $query->where('t.tuneefyLink IS NOT NULL')
+                ->andWhere('t.qobuzLink IS NULL')
                 ->andWhere('t.valid = 1');
         }
 

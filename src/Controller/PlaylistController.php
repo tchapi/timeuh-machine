@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Entity\Track;
 use App\Service\DeezerApi;
+use App\Service\QobuzApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,8 +23,9 @@ final class PlaylistController extends AbstractController
 {
     public const PROVIDER_DEEZER = 'deezer';
     public const PROVIDER_SPOTIFY = 'spotify';
+    public const PROVIDER_QOBUZ = 'qobuz';
 
-    #[Route('/create/playlist/{provider}/{year}/{month}/{day}', name: 'create_playlist', requirements: ['provider' => 'spotify|deezer', 'year' => "\d+", 'month' => "\d+", 'day' => "\d+"])]
+    #[Route('/create/playlist/{provider}/{year}/{month}/{day}', name: 'create_playlist', requirements: ['provider' => 'spotify|deezer|qobuz', 'year' => "\d+", 'month' => "\d+", 'day' => "\d+"])]
     public function intiateCreatePlaylist(EntityManagerInterface $em, TranslatorInterface $translator, Request $request, string $provider, ?int $year = null, ?int $month = null, ?int $day = null)
     {
         $formatter = new \IntlDateFormatter(
@@ -71,9 +73,9 @@ final class PlaylistController extends AbstractController
         $session = $request->getSession();
 
         $session->set('playlist', [
-                'name' => $name,
-                'tracks' => $tracks,
-            ]);
+            'name' => $name,
+            'tracks' => $tracks,
+        ]);
         $session->set('referer', $request->get('referer') ?: $this->generateUrl('archives'));
 
         $finalizeUrl = $this->generateUrl('finalize_playlist', ['provider' => $provider], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -104,12 +106,24 @@ final class PlaylistController extends AbstractController
                     'perms' => 'manage_library',
                 ];
                 break;
+
+            case self::PROVIDER_QOBUZ:
+                $wrapper = new QobuzApi(
+                    $this->getParameter('qobuz_app_id'),
+                    $this->getParameter('qobuz_app_secret'),
+                    $this->getParameter('qobuz_client_id'),
+                    $this->getParameter('qobuz_client_secret'),
+                    $finalizeUrl
+                );
+
+                $options = [];
+                break;
         }
 
         return $this->redirect($wrapper->getAuthorizeUrl($options));
     }
 
-    #[Route('/finalize/playlist/{provider}', name: 'finalize_playlist', requirements: ['provider' => 'spotify|deezer'])]
+    #[Route('/finalize/playlist/{provider}', name: 'finalize_playlist', requirements: ['provider' => 'spotify|deezer|qobuz'])]
     public function finalizeCreatePlaylist(TranslatorInterface $translator, Request $request, string $provider)
     {
         // Retrieves the stored session info
@@ -133,6 +147,17 @@ final class PlaylistController extends AbstractController
                 $wrapper = new DeezerApi(
                     $this->getParameter('deezer_app_id'),
                     $this->getParameter('deezer_secret'),
+                    $finalizeUrl
+                );
+                $api = $wrapper;
+                break;
+
+            case self::PROVIDER_QOBUZ:
+                $wrapper = new QobuzApi(
+                    $this->getParameter('qobuz_app_id'),
+                    $this->getParameter('qobuz_app_secret'),
+                    $this->getParameter('qobuz_client_id'),
+                    $this->getParameter('qobuz_client_secret'),
                     $finalizeUrl
                 );
                 $api = $wrapper;

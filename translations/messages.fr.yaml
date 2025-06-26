@@ -33,7 +33,7 @@ playlist:
     day: "♬ Radiomeuh | %date%"
     month: "♬ Radiomeuh | %year% — %month%"
   message:
-    header: "Playlists Spotify / Deezer"
+    header: "Playlists Spotify / Deezer / Qobuz"
     message_no_tracks: "Malheureusement, nous n'avons aucune piste sur cette plateforme pour cette période ... aucune playlist n'a été créée sur votre compte"
     message_new: "La playlist « %name% » a été ajoutée à votre compte — bonne écoute !"
     message_update: "La playlist « %name% » a été mise à jour avec les nouveaux titres — bonne écoute !"
