@@ -25,7 +25,6 @@ final class PlaylistController extends AbstractController
     public const PROVIDER_SPOTIFY = 'spotify';
     public const PROVIDER_QOBUZ = 'qobuz';
 
-
     #[Route('/create/playlist/{provider}/{year}/{month}/{day}', name: 'create_playlist', requirements: ['provider' => 'spotify|deezer|qobuz', 'year' => "\d+", 'month' => "\d+", 'day' => "\d+"])]
     public function intiateCreatePlaylist(EntityManagerInterface $em, TranslatorInterface $translator, Request $request, string $provider, ?int $year = null, ?int $month = null, ?int $day = null)
     {
@@ -74,9 +73,9 @@ final class PlaylistController extends AbstractController
         $session = $request->getSession();
 
         $session->set('playlist', [
-                'name' => $name,
-                'tracks' => $tracks,
-            ]);
+            'name' => $name,
+            'tracks' => $tracks,
+        ]);
         $session->set('referer', $request->get('referer') ?: $this->generateUrl('archives'));
 
         $finalizeUrl = $this->generateUrl('finalize_playlist', ['provider' => $provider], UrlGeneratorInterface::ABSOLUTE_URL);
