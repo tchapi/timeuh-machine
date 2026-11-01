@@ -14,7 +14,6 @@ return (new PhpCsFixer\Config())
         'linebreak_after_opening_tag' => true,
         'multiline_whitespace_before_semicolons' => false,
         'phpdoc_add_missing_param_annotation' => true,
-        'phpdoc_order' => true,
     ))
     ->setUsingCache(false)
     ->setFinder($finder)

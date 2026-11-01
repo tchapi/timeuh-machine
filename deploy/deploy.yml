@@ -1,5 +1,5 @@
 ---
-- hosts: "{{ timeuh_hosts }}"
+- hosts: "{{ timeuh_hosts }}"
   vars_files:
     - ./vars.yml
   tasks:
@@ -64,7 +64,7 @@
       with_items:
         - .gitignore
         - .git
-        - .php_cs
+        - .php-cs-fixer.php
         - deploy
         - LICENSE
         - README.md
@@ -92,12 +92,16 @@
         src={{ release_path }}
         dest={{ current_path }}
         state=link
-    - name: Delete old dir
-      shell: rm -rf {{ current_release_path.stdout }}/
-      when: current_release_path.stdout != current_path
     - name: Restart PHP-FPM
       become: yes
       become_user: root
       service:
         name: "php8.4-fpm"
         state: restarted
+    - name: Delete old dir
+      become: yes
+      become_user: root
+      file:
+        path: "{{ current_release_path.stdout }}"
+        state: absent
+      when: current_release_path.stdout != current_path

@@ -68,8 +68,12 @@ final class ApiService
 
         // Structure content
         try {
-            $data = json_decode($response);
-        } catch (Exception $e) {
+            $data = json_decode($response, false, 512, \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            return self::RETURN_BAD_RESPONSE;
+        }
+
+        if (!isset($data->result)) {
             return self::RETURN_BAD_RESPONSE;
         }
 

@@ -71,9 +71,9 @@ final class PlaylistController extends AbstractController
         $session = $request->getSession();
 
         $session->set('playlist', [
-                'name' => $name,
-                'tracks' => $tracks,
-            ]);
+            'name' => $name,
+            'tracks' => $tracks,
+        ]);
         $session->set('referer', $request->get('referer') ?: $this->generateUrl('archives'));
 
         $finalizeUrl = $this->generateUrl('finalize_playlist', ['provider' => $provider], UrlGeneratorInterface::ABSOLUTE_URL);

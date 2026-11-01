@@ -49,7 +49,7 @@ class Track
     public function clean(): void
     {
         if (null === $this->title
-            && preg_match("(?P<artist>[^\-\—]*)\s+[\-\–]\s+(?P<title>[^\-\—]*)", $this->artist, $matches)
+            && preg_match('/(?P<artist>[^\-\—]*)\s+[\-\–]\s+(?P<title>[^\-\—]*)/u', $this->artist, $matches)
         ) {
             $this->artist = $matches['artist'];
             $this->title = $matches['title'];
