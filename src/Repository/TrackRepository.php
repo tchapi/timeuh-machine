@@ -26,7 +26,7 @@ final class TrackRepository extends EntityRepository
             ->where('t.startedAt > :limit')
             ->setParameter('limit', $limit)
             ->andWhere('t.valid = 1')
-            ->orderBy('t.startedAt', 'DESC')
+            ->orderBy('t.startedAt', \SortDirection::Descending)
             ->getQuery()
             ->setMaxResults(1)
             ->getOneOrNullResult();
@@ -44,7 +44,7 @@ final class TrackRepository extends EntityRepository
 
         return $q->setFirstResult(($page - 1) * $max)
             ->setMaxResults($max)
-            ->orderBy('t.startedAt', 'DESC')
+            ->orderBy('t.startedAt', \SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -95,7 +95,7 @@ final class TrackRepository extends EntityRepository
     {
         $connection = $this->getEntityManager()
             ->getConnection()
-            ->getWrappedConnection();
+            ->getNativeConnection();
 
         switch ($mode) {
             case self::MODE_YEARS:
@@ -143,7 +143,7 @@ final class TrackRepository extends EntityRepository
             ->andWhere('DAY(t.startedAt) = :day')
             ->setParameter('day', $day)
             ->andWhere('t.valid = 1')
-            ->orderBy('t.startedAt', 'DESC')
+            ->orderBy('t.startedAt', \SortDirection::Descending)
             ->andWhere("t.image != ''")
             ->getQuery()
             ->getResult();
@@ -161,7 +161,7 @@ final class TrackRepository extends EntityRepository
             ->setParameter('month', $month)
             ->andWhere('t.valid = 1')
             ->andWhere('t.'.$columnName.' IS NOT NULL')
-            ->orderBy('t.startedAt', 'DESC')
+            ->orderBy('t.startedAt', \SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -180,7 +180,7 @@ final class TrackRepository extends EntityRepository
             ->setParameter('day', $day)
             ->andWhere('t.valid = 1')
             ->andWhere('t.'.$columnName.' IS NOT NULL')
-            ->orderBy('t.startedAt', 'DESC')
+            ->orderBy('t.startedAt', \SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -207,7 +207,7 @@ final class TrackRepository extends EntityRepository
                 ->setParameter('fromDate', $fromDate);
         }
 
-        return $query->orderBy('t.startedAt', 'DESC')
+        return $query->orderBy('t.startedAt', \SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
