@@ -19,19 +19,10 @@ final class ApiService
     public const RETURN_FAILURE = 0;
     public const RETURN_BAD_RESPONSE = -1;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
+    private ParameterBagInterface $parameterBag;
 
-    /**
-     * @var ParameterBagInterface
-     */
-    private $parameterBag;
-
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(private readonly EntityManagerInterface $em)
     {
-        $this->em = $entityManager;
     }
 
     /**
@@ -51,12 +42,12 @@ final class ApiService
         $ch = curl_init();
 
         curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [],
-            CURLOPT_FOLLOWLOCATION => 1,
+            CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_TIMEOUT_MS => 10000,
             CURLOPT_CONNECTTIMEOUT_MS => 10000,
-            CURLOPT_URL => $this->getParameter('track_endpoint'),
+            CURLOPT_URL => $this->getStringParameter('track_endpoint'),
         ]);
 
         $response = curl_exec($ch);
@@ -95,7 +86,7 @@ final class ApiService
                 $startingTime->sub(new \DateInterval('P1D'));
             }
 
-            if ($tracksRepository->findOneByStartedAt($startingTime)) {
+            if ($tracksRepository->findOneBy(['startedAt' => $startingTime])) {
                 continue;
             }
 
@@ -135,19 +126,22 @@ final class ApiService
         return self::RETURN_SUCCESS;
     }
 
-    public function getTuneefyLinkAndImage(Track $track)
+    /**
+     * @return array{link: string, spotifyLink: ?string, deezerLink: ?string, image: ?string}|null
+     */
+    public function getTuneefyLinkAndImage(Track $track): ?array
     {
         $searchTerm = $track->getTitle().' '.$track->getArtist();
 
         $ch = curl_init();
 
         curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Accept: application/json',
-                'Authorization: bearer '.$this->getParameter('tuneefy_token'),
+                'Authorization: bearer '.$this->getStringParameter('tuneefy_token'),
             ],
-            CURLOPT_URL => str_replace('%s', urlencode($searchTerm), $this->getParameter('tuneefy_track_endpoint')),
+            CURLOPT_URL => str_replace('%s', urlencode($searchTerm), $this->getStringParameter('tuneefy_track_endpoint')),
         ]);
 
         $response = curl_exec($ch);
@@ -165,30 +159,19 @@ final class ApiService
         $intent = $data->results[0]->share->intent;
         $image = $data->results[0]->musical_entity->album->picture;
 
-        if (isset($data->results[0]->musical_entity->links->spotify)) {
-            $spotifyLink = $data->results[0]->musical_entity->links->spotify[0];
-            $spotifyLink = str_replace('https://open.spotify.com/track/', 'spotify:track:', $spotifyLink);
-        } else {
-            $spotifyLink = null;
-        }
-
-        if (isset($data->results[0]->musical_entity->links->deezer)) {
-            $deezerLink = $data->results[0]->musical_entity->links->deezer[0];
-            $deezerLink = str_replace('https://www.deezer.com/track/', '', $deezerLink);
-        } else {
-            $deezerLink = null;
-        }
+        $spotifyLink = self::toSpotifyUri($data->results[0]->musical_entity->links->spotify[0] ?? null);
+        $deezerLink = self::toDeezerId($data->results[0]->musical_entity->links->deezer[0] ?? null);
 
         // Get the link
         $ch = curl_init();
 
         curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HTTPHEADER => [
                 'Accept: application/json',
-                'Authorization: bearer '.$this->getParameter('tuneefy_token'),
+                'Authorization: bearer '.$this->getStringParameter('tuneefy_token'),
             ],
-            CURLOPT_URL => str_replace('%s', $intent, $this->getParameter('tuneefy_share_endpoint')),
+            CURLOPT_URL => str_replace('%s', $intent, $this->getStringParameter('tuneefy_share_endpoint')),
         ]);
 
         $response = curl_exec($ch);
@@ -217,7 +200,7 @@ final class ApiService
         $ch = curl_init();
 
         curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => $tuneefyLink.'?format=json',
         ]);
 
@@ -230,11 +213,7 @@ final class ApiService
 
         $data = json_decode($response, false);
 
-        if (!isset($data->links->spotify)) {
-            return null;
-        }
-
-        return str_replace('https://open.spotify.com/track/', 'spotify:track:', $data->links->spotify[0]);
+        return self::toSpotifyUri($data->links->spotify[0] ?? null);
     }
 
     public function getDeezerLinkForTuneefyLink(string $tuneefyLink): ?string
@@ -242,7 +221,7 @@ final class ApiService
         $ch = curl_init();
 
         curl_setopt_array($ch, [
-            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => $tuneefyLink.'?format=json',
         ]);
 
@@ -255,19 +234,55 @@ final class ApiService
 
         $data = json_decode($response, false);
 
-        if (!isset($data->links->deezer)) {
-            return null;
-        }
-
-        return str_replace('https://www.deezer.com/track/', '', $data->links->deezer[0]);
+        return self::toDeezerId($data->links->deezer[0] ?? null);
     }
 
     /**
-     * Get parameter from ParameterBag.
+     * Converts a Spotify track web link into a Spotify URI.
      */
-    private function getParameter(string $name)
+    private static function toSpotifyUri(mixed $link): ?string
     {
-        return $this->parameterBag->get($name);
+        if (!is_string($link)) {
+            return null;
+        }
+
+        return str_replace('https://open.spotify.com/track/', 'spotify:track:', $link);
+    }
+
+    /**
+     * Extracts the track id from a Deezer track web link.
+     */
+    private static function toDeezerId(mixed $link): ?string
+    {
+        if (!is_string($link)) {
+            return null;
+        }
+
+        return str_replace('https://www.deezer.com/track/', '', $link);
+    }
+
+    /**
+     * Get a string parameter from the ParameterBag.
+     */
+    private function getStringParameter(string $name): string
+    {
+        $value = $this->parameterBag->get($name);
+
+        if (!is_string($value)) {
+            throw new \LogicException(sprintf('Parameter "%s" must be a string, got %s.', $name, get_debug_type($value)));
+        }
+
+        return $value;
+    }
+
+    /**
+     * Get the exclusion regexes from the ParameterBag, indexed by field (title, album, artist).
+     *
+     * @return array<string, list<string>>
+     */
+    private function getExcludes(): array
+    {
+        return $this->parameterBag->get('excludes');
     }
 
     /**
@@ -276,8 +291,8 @@ final class ApiService
     private function checkValid(Track $track): void
     {
         $title = strtolower($track->getTitle());
-        $album = strtolower($track->getAlbum());
-        $artist = strtolower($track->getArtist());
+        $album = strtolower($track->getAlbum() ?? '');
+        $artist = strtolower($track->getArtist() ?? '');
 
         // Is it a RadioMeuh Jingle ?
         // ex : PetiteRadiomeuh (Jingle), Jingle, ...
@@ -315,7 +330,9 @@ final class ApiService
 
         // General exclude rules
         // ex : Moon Tapes, La Dominicale n15, Free Your Mind n18 ...
-        foreach ($this->getParameter('excludes')['title'] as $regex) {
+        $excludes = $this->getExcludes();
+
+        foreach ($excludes['title'] as $regex) {
             if (preg_match($regex, $title)) {
                 $track->setValid(false);
 
@@ -323,7 +340,7 @@ final class ApiService
             }
         }
 
-        foreach ($this->getParameter('excludes')['album'] as $regex) {
+        foreach ($excludes['album'] as $regex) {
             if (preg_match($regex, $album)) {
                 $track->setValid(false);
 
@@ -331,7 +348,7 @@ final class ApiService
             }
         }
 
-        foreach ($this->getParameter('excludes')['artist'] as $regex) {
+        foreach ($excludes['artist'] as $regex) {
             if (preg_match($regex, $artist)) {
                 $track->setValid(false);
 

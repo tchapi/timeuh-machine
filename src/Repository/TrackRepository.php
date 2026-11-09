@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Track;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\ResultSetMapping;
 
+/**
+ * @extends EntityRepository<Track>
+ */
 final class TrackRepository extends EntityRepository
 {
     public const MODE_YEARS = 0;
@@ -18,13 +22,13 @@ final class TrackRepository extends EntityRepository
     public const MISSING_SPOTIFY = 1;
     public const MISSING_DEEZER = 2;
 
-    public function findCurrentlyPlayingTrack()
+    public function findCurrentlyPlayingTrack(): ?Track
     {
         $limit = new \DateTime('now - 30 minutes');
 
         return $this->createQueryBuilder('t')
             ->where('t.startedAt > :limit')
-            ->setParameter('limit', $limit)
+            ->setParameter('limit', $limit, Types::DATETIME_MUTABLE)
             ->andWhere('t.valid = 1')
             ->orderBy('t.startedAt', \SortDirection::Descending)
             ->getQuery()
@@ -32,7 +36,10 @@ final class TrackRepository extends EntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findNLastTracksExceptCurrentOnPage(int $max, ?Track $current, int $page)
+    /**
+     * @return list<Track>
+     */
+    public function findNLastTracksExceptCurrentOnPage(int $max, ?Track $current, int $page): array
     {
         $q = $this->createQueryBuilder('t')
             ->where('t.valid = 1');
@@ -49,7 +56,10 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findHighlightsByYears()
+    /**
+     * @return list<array{0: Track, year_n: int|string}>
+     */
+    public function findHighlightsByYears(): array
     {
         $select = 'SELECT id, title, album, artist, image, year_n FROM years_mv ORDER BY year_n DESC';
 
@@ -61,7 +71,10 @@ final class TrackRepository extends EntityRepository
         return $query->getResult();
     }
 
-    public function findHighlightsByMonths(int $year)
+    /**
+     * @return list<array{0: Track, month_n: int|string}>
+     */
+    public function findHighlightsByMonths(int $year): array
     {
         $select = 'SELECT id, title, album, artist, image, month_n FROM months_mv WHERE year_n = ? ORDER BY month_n DESC';
 
@@ -75,7 +88,10 @@ final class TrackRepository extends EntityRepository
         return $query->getResult();
     }
 
-    public function findHighlightsByDays(int $year, int $month)
+    /**
+     * @return list<array{0: Track, day_n: int|string}>
+     */
+    public function findHighlightsByDays(int $year, int $month): array
     {
         $select = 'SELECT id, title, album, artist, image, day_n FROM days_mv WHERE year_n = ? AND month_n = ? ORDER BY day_n DESC';
 
@@ -91,11 +107,15 @@ final class TrackRepository extends EntityRepository
         return $query->getResult();
     }
 
-    public function updateHighlights(int $mode, int $year, ?int $month = null)
+    public function updateHighlights(int $mode, int $year, ?int $month = null): bool
     {
         $connection = $this->getEntityManager()
             ->getConnection()
             ->getNativeConnection();
+
+        if (!$connection instanceof \PDO) {
+            throw new \RuntimeException('Refreshing highlights requires a PDO connection, got '.get_debug_type($connection));
+        }
 
         switch ($mode) {
             case self::MODE_YEARS:
@@ -110,7 +130,6 @@ final class TrackRepository extends EntityRepository
                 break;
             default:
                 return false;
-                break;
         }
 
         $stmt->bindParam(':year', $year, \PDO::PARAM_INT);
@@ -119,7 +138,10 @@ final class TrackRepository extends EntityRepository
         return true;
     }
 
-    public function findByMonth(int $year, int $month)
+    /**
+     * @return list<array{startedAt: \DateTime, image: ?string, title: string, album: ?string, artist: ?string, day_n: int|string}>
+     */
+    public function findByMonth(int $year, int $month): array
     {
         return $this->createQueryBuilder('t')
             ->select('t.startedAt, t.image, t.title, t.album, t.artist, DAY(t.startedAt) as day_n')
@@ -133,7 +155,10 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findByDay(int $year, int $month, int $day)
+    /**
+     * @return list<Track>
+     */
+    public function findByDay(int $year, int $month, int $day): array
     {
         return $this->createQueryBuilder('t')
             ->where('YEAR(t.startedAt) = :year')
@@ -149,7 +174,10 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findProviderLinksForMonth(string $provider, int $year, int $month)
+    /**
+     * @return list<array<string, string>>
+     */
+    public function findProviderLinksForMonth(string $provider, int $year, int $month): array
     {
         $columnName = $provider.'Link';
 
@@ -166,7 +194,10 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findProviderLinksForDay(string $provider, int $year, int $month, int $day)
+    /**
+     * @return list<array<string, string>>
+     */
+    public function findProviderLinksForDay(string $provider, int $year, int $month, int $day): array
     {
         $columnName = $provider.'Link';
 
@@ -185,7 +216,10 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    public function findMissingTracksFrom(int $what = self::MISSING_TUNEEFY, ?\DateTime $fromDate = null)
+    /**
+     * @return list<Track>
+     */
+    public function findMissingTracksFrom(int $what = self::MISSING_TUNEEFY, ?\DateTime $fromDate = null): array
     {
         $query = $this->createQueryBuilder('t');
 
@@ -204,7 +238,7 @@ final class TrackRepository extends EntityRepository
 
         if ($fromDate) {
             $query->andWhere('t.startedAt > :fromDate')
-                ->setParameter('fromDate', $fromDate);
+                ->setParameter('fromDate', $fromDate, Types::DATETIME_MUTABLE);
         }
 
         return $query->orderBy('t.startedAt', \SortDirection::Descending)
@@ -212,7 +246,7 @@ final class TrackRepository extends EntityRepository
             ->getResult();
     }
 
-    private function getTrackResultSetMapping()
+    private function getTrackResultSetMapping(): ResultSetMapping
     {
         $rsm = new ResultSetMapping();
         $rsm->addEntityResult(Track::class, 't');

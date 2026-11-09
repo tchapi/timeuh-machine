@@ -8,20 +8,19 @@ use App\Repository\TrackRepository;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class ArchivesUpdaterCommand extends Command
 {
     public const STARTING_YEAR = 2017;
 
-    private $trackRepository;
-
-    public function __construct(TrackRepository $trackRepository)
+    public function __construct(private readonly TrackRepository $trackRepository)
     {
-        $this->trackRepository = $trackRepository;
         parent::__construct();
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -35,8 +34,13 @@ final class ArchivesUpdaterCommand extends Command
             );
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        if (!$output instanceof ConsoleOutputInterface) {
+            throw new \LogicException('This command requires a console output supporting sections.');
+        }
+
         $thisYear = intval((new \DateTime())->format('Y'));
         $thisMonth = intval((new \DateTime())->format('m'));
 
@@ -72,12 +76,15 @@ final class ArchivesUpdaterCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function runCommand($command, InputInterface $input, OutputInterface $output)
+    protected function runCommand(string $command, InputInterface $input, OutputInterface $output): static
     {
-        $this
-            ->getApplication()
-            ->find($command)
-            ->run($input, $output);
+        $application = $this->getApplication();
+
+        if (null === $application) {
+            throw new \LogicException('Cannot run a sub-command without an application.');
+        }
+
+        $application->find($command)->run($input, $output);
 
         return $this;
     }

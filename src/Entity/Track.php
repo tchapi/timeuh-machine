@@ -14,41 +14,42 @@ class Track
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(type: 'integer')]
-    private $id;
+    private ?int $id = null;
 
     #[ORM\Column(type: 'string', nullable: false)]
-    private $title;
+    private string $title;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private $album;
+    private ?string $album = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private $artist;
+    private ?string $artist = null;
 
     #[ORM\Column(type: 'datetime')]
-    private $startedAt;
+    private \DateTime $startedAt;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private $image;
+    private ?string $image = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private $tuneefyLink;
+    private ?string $tuneefyLink = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private $spotifyLink;
+    private ?string $spotifyLink = null;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private $deezerLink;
+    private ?string $deezerLink = null;
 
     #[ORM\Column(type: 'boolean', nullable: true)]
-    private $valid;
+    private ?bool $valid = null;
 
     /**
      * Cleans up the track / artist / album separation of this Track.
      */
     public function clean(): void
     {
-        if (null === $this->title
+        if ('' === $this->title
+            && null !== $this->artist
             && preg_match('/(?P<artist>[^\-\—]*)\s+[\-\–]\s+(?P<title>[^\-\—]*)/u', $this->artist, $matches)
         ) {
             $this->artist = $matches['artist'];
@@ -56,238 +57,120 @@ class Track
         }
     }
 
-    /**
-     * Get id.
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set title.
-     *
-     * @param string $title
-     *
-     * @return Track
-     */
-    public function setTitle($title)
+    public function setTitle(string $title): static
     {
         $this->title = $title;
 
         return $this;
     }
 
-    /**
-     * Get title.
-     *
-     * @return string
-     */
-    public function getTitle()
+    public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * Set album.
-     *
-     * @param string $album
-     *
-     * @return Track
-     */
-    public function setAlbum($album)
+    public function setAlbum(?string $album): static
     {
         $this->album = $album;
 
         return $this;
     }
 
-    /**
-     * Get album.
-     *
-     * @return string
-     */
-    public function getAlbum()
+    public function getAlbum(): ?string
     {
         return $this->album;
     }
 
-    /**
-     * Set artist.
-     *
-     * @param string $artist
-     *
-     * @return Track
-     */
-    public function setArtist($artist)
+    public function setArtist(?string $artist): static
     {
         $this->artist = $artist;
 
         return $this;
     }
 
-    /**
-     * Get artist.
-     *
-     * @return string
-     */
-    public function getArtist()
+    public function getArtist(): ?string
     {
         return $this->artist;
     }
 
-    /**
-     * Set startedAt.
-     *
-     * @param \DateTime $startedAt
-     *
-     * @return Track
-     */
-    public function setStartedAt($startedAt)
+    public function setStartedAt(\DateTime $startedAt): static
     {
         $this->startedAt = $startedAt;
 
         return $this;
     }
 
-    /**
-     * Get startedAt.
-     *
-     * @return \DateTime
-     */
-    public function getStartedAt()
+    public function getStartedAt(): \DateTime
     {
         return $this->startedAt;
     }
 
-    /**
-     * Set image.
-     *
-     * @param string $image
-     *
-     * @return Track
-     */
-    public function setImage($image)
+    public function setImage(?string $image): static
     {
         $this->image = $image;
 
         return $this;
     }
 
-    /**
-     * Get image.
-     *
-     * @return string
-     */
-    public function getImage()
+    public function getImage(): ?string
     {
         return $this->image;
     }
 
-    /**
-     * Set tuneefyLink.
-     *
-     * @param string $tuneefyLink
-     *
-     * @return Track
-     */
-    public function setTuneefyLink($tuneefyLink)
+    public function setTuneefyLink(?string $tuneefyLink): static
     {
         $this->tuneefyLink = $tuneefyLink;
 
         return $this;
     }
 
-    /**
-     * Get tuneefyLink.
-     *
-     * @return string
-     */
-    public function getTuneefyLink()
+    public function getTuneefyLink(): ?string
     {
         return $this->tuneefyLink;
     }
 
-    /**
-     * Set valid.
-     *
-     * @param bool $valid
-     *
-     * @return Track
-     */
-    public function setValid($valid)
+    public function setValid(bool $valid): static
     {
         $this->valid = $valid;
 
         return $this;
     }
 
-    /**
-     * Get valid.
-     *
-     * @return bool
-     */
-    public function getValid()
+    public function getValid(): ?bool
     {
         return $this->valid;
     }
 
-    /**
-     * Is valid.
-     *
-     * @return bool
-     */
-    public function isValid()
+    public function isValid(): ?bool
     {
         return $this->valid;
     }
 
-    /**
-     * Set spotifyLink.
-     *
-     * @param string $spotifyLink
-     *
-     * @return Track
-     */
-    public function setSpotifyLink($spotifyLink)
+    public function setSpotifyLink(?string $spotifyLink): static
     {
         $this->spotifyLink = $spotifyLink;
 
         return $this;
     }
 
-    /**
-     * Get spotifyLink.
-     *
-     * @return string
-     */
-    public function getSpotifyLink()
+    public function getSpotifyLink(): ?string
     {
         return $this->spotifyLink;
     }
 
-    /**
-     * Set deezerLink.
-     *
-     * @param string $deezerLink
-     *
-     * @return Track
-     */
-    public function setDeezerLink($deezerLink)
+    public function setDeezerLink(?string $deezerLink): static
     {
         $this->deezerLink = $deezerLink;
 
         return $this;
     }
 
-    /**
-     * Get deezerLink.
-     *
-     * @return string
-     */
-    public function getDeezerLink()
+    public function getDeezerLink(): ?string
     {
         return $this->deezerLink;
     }

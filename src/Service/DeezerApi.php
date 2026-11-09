@@ -12,40 +12,20 @@ final class DeezerApi
     private const PLAYLISTS_ENDPOINT = 'https://api.deezer.com/user/me/playlists';
     private const PLAYLISTS_TRACKS_ENDPOINT = 'https://api.deezer.com/playlist/%s/tracks';
 
-    /**
-     * @var string
-     */
-    private $app_id;
+    private ?string $access_token = null;
 
-    /**
-     * @var string
-     */
-    private $secret;
+    private ?\DateTime $expire = null;
 
-    /**
-     * @var string
-     */
-    private $redirect_uri;
-
-    /**
-     * @var string
-     */
-    private $access_token;
-
-    /**
-     * @var string
-     */
-    private $expire;
-
-    public function __construct(string $app_id, string $secret, string $redirect_uri)
-    {
-        $this->app_id = $app_id;
-        $this->secret = $secret;
-        $this->redirect_uri = $redirect_uri;
-        $this->access_token = null;
-        $this->expire = 0;
+    public function __construct(
+        private readonly string $app_id,
+        private readonly string $secret,
+        private readonly string $redirect_uri,
+    ) {
     }
 
+    /**
+     * @param array<string, mixed>|null $options
+     */
     public function getAuthorizeUrl(?array $options): string
     {
         $boilerplate = [
@@ -53,7 +33,7 @@ final class DeezerApi
             'redirect_uri' => $this->redirect_uri,
         ];
 
-        $params = array_merge($boilerplate, $options);
+        $params = array_merge($boilerplate, $options ?? []);
 
         return self::AUTH_URL.'?'.http_build_query($params);
     }
@@ -73,7 +53,7 @@ final class DeezerApi
         $curlHandler = curl_init();
 
         curl_setopt_array($curlHandler, [
-            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => self::TOKEN_ENDPOINT.'?'.http_build_query($params),
         ]);
 
@@ -94,16 +74,21 @@ final class DeezerApi
         $this->expire = new \DateTime('now + '.((int) $token_info->expires).'seconds');
     }
 
-    public function getUserPlaylists()
+    private function assertAuthenticated(): void
     {
-        if (!$this->access_token || $this->expire < new \DateTime()) {
+        if (null === $this->access_token || '' === $this->access_token || null === $this->expire || $this->expire < new \DateTime()) {
             throw new \Exception('Deezer API: Missing access token or token expired');
         }
+    }
+
+    public function getUserPlaylists(): \stdClass
+    {
+        $this->assertAuthenticated();
 
         $curlHandler = curl_init();
 
         curl_setopt_array($curlHandler, [
-            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => $this->createApiUri(self::PLAYLISTS_ENDPOINT),
         ]);
 
@@ -130,17 +115,18 @@ final class DeezerApi
         ];
     }
 
-    public function createPlaylist(array $params)
+    /**
+     * @param array{name: string} $params
+     */
+    public function createPlaylist(array $params): \stdClass
     {
-        if (!$this->access_token || $this->expire < new \DateTime()) {
-            throw new \Exception('Deezer API: Missing access token or token expired');
-        }
+        $this->assertAuthenticated();
 
         $curlHandler = curl_init();
 
         curl_setopt_array($curlHandler, [
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_POST => 1,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
             CURLOPT_URL => $this->createApiUri(self::PLAYLISTS_ENDPOINT),
             CURLOPT_POSTFIELDS => http_build_query(['title' => $params['name']]),
         ]);
@@ -160,18 +146,16 @@ final class DeezerApi
         return $playlist;
     }
 
-    public function getPlaylistTracks(string $playlistId)
+    public function getPlaylistTracks(string $playlistId): \stdClass
     {
-        if (!$this->access_token || $this->expire < new \DateTime()) {
-            throw new \Exception('Deezer API: Missing access token or token expired');
-        }
+        $this->assertAuthenticated();
 
         $endpoint = str_replace('%s', $playlistId, self::PLAYLISTS_TRACKS_ENDPOINT);
 
         $curlHandler = curl_init();
 
         curl_setopt_array($curlHandler, [
-            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_URL => $this->createApiUri($endpoint, ['limit' => 3000]),
         ]);
 
@@ -198,11 +182,12 @@ final class DeezerApi
         ];
     }
 
+    /**
+     * @param list<string> $tracks
+     */
     public function addPlaylistTracks(string $playlistId, array $tracks): void
     {
-        if (!$this->access_token || $this->expire < new \DateTime()) {
-            throw new \Exception('Deezer API: Missing access token or token expired');
-        }
+        $this->assertAuthenticated();
 
         $tracks_param = implode(',', $tracks);
         $endpoint = str_replace('%s', $playlistId, self::PLAYLISTS_TRACKS_ENDPOINT);
@@ -210,8 +195,8 @@ final class DeezerApi
         $curlHandler = curl_init();
 
         curl_setopt_array($curlHandler, [
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_POST => 1,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
             CURLOPT_URL => $this->createApiUri($endpoint),
             CURLOPT_POSTFIELDS => http_build_query(['songs' => $tracks_param]),
         ]);
@@ -224,7 +209,10 @@ final class DeezerApi
         }
     }
 
-    private function createApiUri(string $endpoint, array $params = [])
+    /**
+     * @param array<string, mixed> $params
+     */
+    private function createApiUri(string $endpoint, array $params = []): string
     {
         $query = array_merge([
             'access_token' => $this->access_token,

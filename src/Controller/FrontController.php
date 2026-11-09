@@ -8,6 +8,7 @@ use App\Entity\Track;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
@@ -18,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 final class FrontController extends AbstractController
 {
     #[Route('/{page}', name: 'home', requirements: ['page' => '\d+'], defaults: ['page' => 1])]
-    public function homeAction(EntityManagerInterface $em, Request $request, int $page)
+    public function homeAction(EntityManagerInterface $em, Request $request, int $page): Response
     {
         $page = $page > 1 ? $page : 1;
 
@@ -40,13 +41,13 @@ final class FrontController extends AbstractController
     }
 
     #[Route('/about', name: 'about')]
-    public function aboutAction()
+    public function aboutAction(): Response
     {
         return $this->render('about.html.twig');
     }
 
     #[Route('/archives/{year}/{month}/{day}', name: 'archives', requirements: ['year' => '\d+', 'month' => '\d+', 'day' => '\d+'])]
-    public function archivesAction(EntityManagerInterface $em, Request $request, ?int $year = null, ?int $month = null, ?int $day = null)
+    public function archivesAction(EntityManagerInterface $em, Request $request, ?int $year = null, ?int $month = null, ?int $day = null): Response
     {
         $formatter = new \IntlDateFormatter(
             'fr_FR', // Could be $request->getLocale()

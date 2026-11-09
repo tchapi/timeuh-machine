@@ -15,23 +15,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class TrackFetcherCommand extends Command
 {
-    /**
-     * @var ApiService
-     */
-    private $apiService;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    public function __construct(ApiService $apiService, EntityManagerInterface $em)
-    {
-        $this->apiService = $apiService;
-        $this->em = $em;
+    public function __construct(
+        private readonly ApiService $apiService,
+        private readonly EntityManagerInterface $em,
+    ) {
         parent::__construct();
     }
 
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -63,6 +54,7 @@ final class TrackFetcherCommand extends Command
             );
     }
 
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $trackRepository = $this->em->getRepository(Track::class);
@@ -78,7 +70,7 @@ final class TrackFetcherCommand extends Command
             $counter = 0;
 
             foreach ($tracks as $track) {
-                $output->write('<comment>Fetching missing data for track #'.$track->getId().' (aired '.$track->getStartedAt().') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+                $output->write('<comment>Fetching missing data for track #'.$track->getId().' (aired '.$track->getStartedAt()->format('Y-m-d H:i:s').') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
                 $result = $this->apiService->getTuneefyLinkAndImage($track);
                 if ($result) {
@@ -102,7 +94,7 @@ final class TrackFetcherCommand extends Command
             $counter = 0;
 
             foreach ($tracks as $track) {
-                $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' (aired '.$track->getStartedAt().') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+                $output->write('<comment>Fetching missing Spotify data for track #'.$track->getId().' (aired '.$track->getStartedAt()->format('Y-m-d H:i:s').') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
                 if (null !== $track->getTuneefyLink()) {
                     $result = $this->apiService->getSpotifyLinkForTuneefyLink($track->getTuneefyLink());
@@ -126,7 +118,7 @@ final class TrackFetcherCommand extends Command
             $counter = 0;
 
             foreach ($tracks as $track) {
-                $output->write('<comment>Fetching missing Deezer data for track #'.$track->getId().' (aired '.$track->getStartedAt().') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
+                $output->write('<comment>Fetching missing Deezer data for track #'.$track->getId().' (aired '.$track->getStartedAt()->format('Y-m-d H:i:s').') "'.$track->getTitle().'" - "'.$track->getAlbum().'" - "'.$track->getArtist().'"</comment> ... ');
 
                 if (null !== $track->getTuneefyLink()) {
                     $result = $this->apiService->getDeezerLinkForTuneefyLink($track->getTuneefyLink());
@@ -160,12 +152,15 @@ final class TrackFetcherCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function runCommand($command, InputInterface $input, OutputInterface $output)
+    protected function runCommand(string $command, InputInterface $input, OutputInterface $output): static
     {
-        $this
-            ->getApplication()
-            ->find($command)
-            ->run($input, $output);
+        $application = $this->getApplication();
+
+        if (null === $application) {
+            throw new \LogicException('Cannot run a sub-command without an application.');
+        }
+
+        $application->find($command)->run($input, $output);
 
         return $this;
     }

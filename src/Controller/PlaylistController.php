@@ -9,6 +9,7 @@ use App\Service\DeezerApi;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -24,8 +25,12 @@ final class PlaylistController extends AbstractController
     public const PROVIDER_SPOTIFY = 'spotify';
 
     #[Route('/create/playlist/{provider}/{year}/{month}/{day}', name: 'create_playlist', requirements: ['provider' => 'spotify|deezer', 'year' => "\d+", 'month' => "\d+", 'day' => "\d+"])]
-    public function intiateCreatePlaylist(EntityManagerInterface $em, TranslatorInterface $translator, Request $request, string $provider, ?int $year = null, ?int $month = null, ?int $day = null)
+    public function intiateCreatePlaylist(EntityManagerInterface $em, TranslatorInterface $translator, Request $request, string $provider, ?int $year = null, ?int $month = null, ?int $day = null): Response
     {
+        if (null === $year || null === $month) {
+            throw $this->createNotFoundException('A year and a month are required to create a playlist.');
+        }
+
         $formatter = new \IntlDateFormatter(
             'fr_FR', // Could be $request->getLocale()
             \IntlDateFormatter::FULL,
@@ -38,16 +43,14 @@ final class PlaylistController extends AbstractController
         $repository = $em->getRepository(Track::class);
         $provider = strtolower($provider);
 
-        if ($month) {
-            if ($day) {
-                $formatter->setPattern('dd/MM/yyyy');
-                $tracks = $repository->findProviderLinksForDay($provider, $year, $month, $day);
-                $name = $translator->trans('playlist.title.day', ['%date%' => $formatter->format(mktime(0, 0, 0, $month, $day, $year))]);
-            } else {
-                $formatter->setPattern('MMMM');
-                $tracks = $repository->findProviderLinksForMonth($provider, $year, $month);
-                $name = $translator->trans('playlist.title.month', ['%month%' => ucfirst($formatter->format(mktime(0, 0, 0, $month))), '%year%' => $year]);
-            }
+        if ($day) {
+            $formatter->setPattern('dd/MM/yyyy');
+            $tracks = $repository->findProviderLinksForDay($provider, $year, $month, $day);
+            $name = $translator->trans('playlist.title.day', ['%date%' => $formatter->format(mktime(0, 0, 0, $month, $day, $year))]);
+        } else {
+            $formatter->setPattern('MMMM');
+            $tracks = $repository->findProviderLinksForMonth($provider, $year, $month);
+            $name = $translator->trans('playlist.title.month', ['%month%' => ucfirst($formatter->format(mktime(0, 0, 0, $month))), '%year%' => $year]);
         }
 
         // If there is no track
@@ -81,8 +84,8 @@ final class PlaylistController extends AbstractController
         switch ($provider) {
             case self::PROVIDER_SPOTIFY:
                 $wrapper = new \SpotifyWebAPI\Session(
-                    $this->getParameter('spotify_client_id'),
-                    $this->getParameter('spotify_client_secret'),
+                    $this->getStringParameter('spotify_client_id'),
+                    $this->getStringParameter('spotify_client_secret'),
                     $finalizeUrl
                 );
 
@@ -95,8 +98,8 @@ final class PlaylistController extends AbstractController
 
             case self::PROVIDER_DEEZER:
                 $wrapper = new DeezerApi(
-                    $this->getParameter('deezer_app_id'),
-                    $this->getParameter('deezer_secret'),
+                    $this->getStringParameter('deezer_app_id'),
+                    $this->getStringParameter('deezer_secret'),
                     $finalizeUrl
                 );
 
@@ -104,13 +107,16 @@ final class PlaylistController extends AbstractController
                     'perms' => 'manage_library',
                 ];
                 break;
+
+            default:
+                throw $this->createNotFoundException('Unknown provider '.$provider);
         }
 
         return $this->redirect($wrapper->getAuthorizeUrl($options));
     }
 
     #[Route('/finalize/playlist/{provider}', name: 'finalize_playlist', requirements: ['provider' => 'spotify|deezer'])]
-    public function finalizeCreatePlaylist(TranslatorInterface $translator, Request $request, string $provider)
+    public function finalizeCreatePlaylist(TranslatorInterface $translator, Request $request, string $provider): Response
     {
         // Retrieves the stored session info
         $session = $request->getSession();
@@ -122,8 +128,8 @@ final class PlaylistController extends AbstractController
         switch ($provider) {
             case self::PROVIDER_SPOTIFY:
                 $wrapper = new \SpotifyWebAPI\Session(
-                    $this->getParameter('spotify_client_id'),
-                    $this->getParameter('spotify_client_secret'),
+                    $this->getStringParameter('spotify_client_id'),
+                    $this->getStringParameter('spotify_client_secret'),
                     $finalizeUrl
                 );
                 $api = new \SpotifyWebAPI\SpotifyWebAPI();
@@ -131,12 +137,15 @@ final class PlaylistController extends AbstractController
 
             case self::PROVIDER_DEEZER:
                 $wrapper = new DeezerApi(
-                    $this->getParameter('deezer_app_id'),
-                    $this->getParameter('deezer_secret'),
+                    $this->getStringParameter('deezer_app_id'),
+                    $this->getStringParameter('deezer_secret'),
                     $finalizeUrl
                 );
                 $api = $wrapper;
                 break;
+
+            default:
+                throw $this->createNotFoundException('Unknown provider '.$provider);
         }
 
         if (!$request->query->has('code')) {
@@ -150,19 +159,21 @@ final class PlaylistController extends AbstractController
             return $this->redirectToRoute('home');
         }
 
-        if (self::PROVIDER_SPOTIFY === $provider) {
-            $accessToken = $wrapper->getAccessToken();
+        if ($api instanceof DeezerApi) {
+            $playlists = $api->getUserPlaylists();
+        } else {
+            if (!$wrapper instanceof \SpotifyWebAPI\Session) {
+                throw new \LogicException('The Spotify API requires a Spotify session.');
+            }
 
             // Set the access token on the API wrapper
-            $api->setAccessToken($accessToken);
+            $api->setAccessToken($wrapper->getAccessToken());
 
             // Get user id
             $me = $api->me();
 
             // If the playlist exists, find its id
             $playlists = $api->getUserPlaylists($me->id);
-        } else {
-            $playlists = $api->getUserPlaylists();
         }
 
         $providerPlaylistId = array_reduce($playlists->items, static function ($carry, $existingPlaylist) use ($playlist) {
@@ -210,5 +221,16 @@ final class PlaylistController extends AbstractController
 
         // Redirect to page where the user was, with a popin
         return $this->redirect($referer);
+    }
+
+    private function getStringParameter(string $name): string
+    {
+        $value = $this->getParameter($name);
+
+        if (!is_string($value)) {
+            throw new \LogicException(sprintf('Parameter "%s" must be a string, got %s.', $name, get_debug_type($value)));
+        }
+
+        return $value;
     }
 }
