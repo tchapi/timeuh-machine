@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static-analysis:
+    name: Code style & static analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, pdo_mysql
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          composer-options: --prefer-dist --no-progress
+
+      # PHPStan and Psalm read the dumped container from var/cache/dev
+      - name: Warm up the Symfony cache
+        run: php bin/console cache:warmup --env=dev
+
+      - name: Check coding standards
+        run: vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.php --dry-run --diff
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress --error-format=github
+
+      - name: Psalm
+        run: vendor/bin/psalm --no-progress --output-format=github --no-cache
