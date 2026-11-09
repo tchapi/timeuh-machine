@@ -120,6 +120,9 @@
     "php-cs-fixer/diff": {
         "version": "v1.3.0"
     },
+    "phpstan/phpstan": {
+        "version": "2.3.5"
+    },
     "psr/cache": {
         "version": "1.0.1"
     },

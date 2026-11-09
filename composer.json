@@ -4,7 +4,7 @@
     "type": "project",
     "description": "🐮🧀 The RadioMeuh Timeuh Machine (https://www.timeuh-machine.com)",
     "require": {
-        "php": "^8.4",
+        "php": "^8.4.27",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "beberlei/doctrineextensions": "^1.5",
@@ -26,9 +26,16 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.49.0",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.3",
+        "phpstan/phpstan-doctrine": "^2.1",
+        "phpstan/phpstan-symfony": "^2.1",
+        "psalm/plugin-symfony": "^5.10",
         "symfony/phpunit-bridge": "^7.4",
         "symfony/stopwatch": "^7.4",
-        "symfony/web-profiler-bundle": "^7.4"
+        "symfony/web-profiler-bundle": "^7.4",
+        "vimeo/psalm": "^7.2",
+        "weirdan/doctrine-psalm-plugin": "^2.11"
     },
     "config": {
         "preferred-install": {
@@ -39,7 +46,8 @@
             "php": "8.4.27"
         },
         "allow-plugins": {
-            "symfony/flex": true
+            "symfony/flex": true,
+            "phpstan/extension-installer": true
         }
     },
     "autoload": {
@@ -62,7 +70,9 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
-        ]
+        ],
+        "phpstan": "phpstan analyse",
+        "psalm": "psalm --no-cache"
     },
     "conflict": {
         "symfony/symfony": "*"
