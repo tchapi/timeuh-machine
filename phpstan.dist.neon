@@ -10,3 +10,10 @@ parameters:
     doctrine:
         objectManagerLoader: tests/object-manager.php
     treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # jwilsson/spotify-web-api-php declares its responses as array|object because the shape
+        # depends on a runtime option; we use the default object mode, so property access is safe.
+        -
+            identifier: property.nonObject
+            path: src/Controller/PlaylistController.php
+            count: 4
